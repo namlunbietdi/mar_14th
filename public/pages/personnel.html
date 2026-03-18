@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quan ly nhan su</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body class="module-body">
+  <div class="site-header-shell">
+    <header class="site-header">
+      <div class="header-left">
+        <div class="header-logos">
+          <img class="header-logo" src="../assets/images/utc_logo.png" alt="Logo Dai hoc Giao thong Van tai">
+          <img class="header-logo" src="../assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
+        </div>
+        <div class="header-copy">
+          <p>Do an Tot nghiep</p>
+          <h2>HE THONG QUAN LY XE BUYT THONG MINH</h2>
+          <h3>Ung dung IoT cho dinh vi, giam sat va dieu phoi phuong tien cong cong</h3>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <main class="module-shell">
+    <a class="back-link" href="../dashboard.html">< Quay lai dashboard</a>
+
+    <section class="page-card user-management-card">
+      <div class="user-page-header">
+        <div>
+          <p class="eyebrow">Module Nhan su</p>
+          <h1>Quan ly nhan su</h1>
+          <p>Danh sach tai xe va nhan vien phuc vu trong he thong van hanh xe buyt.</p>
+        </div>
+
+        <div class="toolbar-actions">
+          <button id="downloadTemplateBtn" class="secondary-btn" type="button">Xuat mau file CSV</button>
+          <button id="importEmployeesBtn" class="secondary-btn" type="button">Import</button>
+          <button id="exportEmployeesBtn" class="secondary-btn" type="button">Export</button>
+          <button id="openEmployeeModalBtn" class="primary-btn" type="button">Them nhan vien</button>
+        </div>
+      </div>
+
+      <div class="user-toolbar">
+        <input id="employeeSearchInput" class="search-input" type="search" placeholder="Tim theo ma nhan vien, ho ten, chuc vu">
+        <button id="searchEmployeeBtn" class="secondary-btn" type="button">Tim kiem</button>
+      </div>
+
+      <p id="employeePageMessage" class="inline-message" aria-live="polite"></p>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>
+                <button id="employeeCodeSortBtn" class="table-sort-btn" type="button">
+                  Ma nhan vien
+                  <span id="employeeCodeSortIcon">↑</span>
+                </button>
+              </th>
+              <th>Ho va ten</th>
+              <th>Ngay sinh</th>
+              <th>Chuc vu</th>
+              <th>Trang thai</th>
+              <th>Thao tac</th>
+            </tr>
+          </thead>
+          <tbody id="employeeTableBody">
+            <tr>
+              <td colspan="6">Dang tai du lieu...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <input id="employeeImportInput" type="file" accept=".csv,text/csv" hidden>
+
+  <div id="employeeModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 id="employeeModalTitle">Them nhan vien</h2>
+          <p id="employeeModalSubtitle">Nhap thong tin nhan su de them vao he thong.</p>
+        </div>
+        <button id="closeEmployeeModalBtn" class="icon-btn" type="button">X</button>
+      </div>
+
+      <form id="employeeForm" class="user-form-grid">
+        <input id="editingEmployeeId" type="hidden">
+
+        <label class="field">
+          <span>Ma nhan vien</span>
+          <input id="formEmployeeCode" type="text" readonly>
+        </label>
+
+        <label class="field">
+          <span>Ho va ten</span>
+          <input id="formEmployeeName" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Ngay sinh</span>
+          <input id="formEmployeeBirthDate" type="date" required>
+        </label>
+
+        <label class="field">
+          <span>Chuc vu</span>
+          <input id="formEmployeePosition" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Trang thai</span>
+          <select id="formEmployeeStatus" required>
+            <option value="working">Dang lam viec</option>
+            <option value="left">Da nghi</option>
+          </select>
+        </label>
+
+        <p id="employeeFormMessage" class="inline-message" aria-live="polite"></p>
+
+        <div class="modal-actions">
+          <button id="cancelEmployeeModalBtn" class="secondary-btn" type="button">Huy</button>
+          <button class="primary-btn" type="submit">Luu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="../assets/personnel.js"></script>
+</body>
+</html>

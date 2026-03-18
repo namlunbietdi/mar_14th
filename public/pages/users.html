@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quan ly nguoi dung</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body class="module-body">
+  <div class="site-header-shell">
+    <header class="site-header">
+      <div class="header-left">
+        <div class="header-logos">
+          <img class="header-logo" src="../assets/images/utc_logo.png" alt="Logo Dai hoc Giao thong Van tai">
+          <img class="header-logo" src="../assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
+        </div>
+        <div class="header-copy">
+          <p>Đồ án tốt nghiệp</p>
+          <h2>HỆ THỐNG GIÁM SÁT VÀ ĐIỀU PHỐI XE BUÝT</h2>
+          <h3>Ứng dụng IoT cho định vị, giám sát và điều phối phương tiện công cộng</h3>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <main class="module-shell">
+    <a class="back-link" href="../dashboard.html">< Quay lai dashboard</a>
+
+    <section class="page-card user-management-card">
+      <div class="user-page-header">
+        <div>
+          <p class="eyebrow">Module 05</p>
+          <h1>Quan ly nguoi dung</h1>
+          <p>Quan ly tai khoan dang nhap, vai tro truy cap va thong tin nhan su cua he thong.</p>
+        </div>
+
+        <button id="openUserModalBtn" class="primary-btn" type="button">Them nguoi dung</button>
+      </div>
+
+      <div class="user-toolbar">
+        <input id="userSearchInput" class="search-input" type="search" placeholder="Tim theo username, ho ten, chuc vu, role">
+        <button id="searchUserBtn" class="secondary-btn" type="button">Tim kiem</button>
+      </div>
+
+      <p id="userPageMessage" class="inline-message" aria-live="polite"></p>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Ho va Ten</th>
+              <th>Chuc vu</th>
+              <th>Role</th>
+              <th>Thao tac</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody">
+            <tr>
+              <td colspan="5">Dang tai du lieu...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="userModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 id="userModalTitle">Them nguoi dung</h2>
+          <p id="userModalSubtitle">Nhap thong tin tai khoan can quan ly.</p>
+        </div>
+        <button id="closeUserModalBtn" class="icon-btn" type="button">X</button>
+      </div>
+
+      <form id="userForm" class="user-form-grid">
+        <input id="editingUserId" type="hidden">
+
+        <label class="field">
+          <span>Username</span>
+          <input id="formUsername" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Mat khau</span>
+          <input id="formPassword" type="password" placeholder="Nhap mat khau">
+        </label>
+
+        <label class="field">
+          <span>Ho va Ten</span>
+          <input id="formFullName" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Chuc vu</span>
+          <input id="formPosition" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Role</span>
+          <select id="formRole" required>
+            <option value="admin">admin</option>
+            <option value="staff">staff</option>
+          </select>
+        </label>
+
+        <p id="userFormHint" class="form-hint"></p>
+        <p id="userFormMessage" class="inline-message" aria-live="polite"></p>
+
+        <div class="modal-actions">
+          <button id="cancelUserModalBtn" class="secondary-btn" type="button">Huy</button>
+          <button class="primary-btn" type="submit">Luu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="../assets/users.js"></script>
+</body>
+</html>

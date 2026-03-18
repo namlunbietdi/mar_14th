@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="login-body">
+  <div class="site-header-shell">
+    <header class="site-header">
+      <div class="header-left">
+        <div class="header-logos">
+          <img class="header-logo" src="assets/images/utc_logo.png" alt="Logo Dai hoc Giao thong Van tai">
+          <img class="header-logo" src="assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
+        </div>
+        <div class="header-copy">
+          <p>Đồ án tốt nghiệp</p>
+          <h2>HỆ THỐNG GIÁM SÁT VÀ ĐIỀU PHỐI XE BUÝT</h2>
+          <h3>Ứng dụng IoT cho định vị, giám sát và điều phối phương tiện công cộng</h3>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <main class="login-shell">
+    <section class="login-panel">
+      <form id="loginForm" class="login-form">
+        <label class="field">
+          <span>Tên đăng nhập</span>
+          <input id="username" name="username" type="text" placeholder="Vui lòng nhập tên đăng nhập..." required>
+        </label>
+
+        <label class="field">
+          <span>Mật khẩu</span>
+          <input id="password" name="password" type="password" placeholder="Nhập mật khẩu..." required>
+        </label>
+
+        <button type="submit" class="primary-btn">Đăng nhập</button>
+        <p id="loginMessage" class="form-message" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <script src="assets/login.js"></script>
+</body>
+</html>

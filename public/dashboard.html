@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang chuc nang he thong xe buyt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="app-body">
+  <div class="site-header-shell">
+    <header class="site-header">
+      <div class="header-left">
+        <div class="header-logos">
+          <img class="header-logo" src="assets/images/utc_logo.png" alt="Logo Dai hoc Giao thong Van tai">
+          <img class="header-logo" src="assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
+        </div>
+        <div class="header-copy">
+          <p>Đồ án tốt nghiệp</p>
+          <h2>HỆ THỐNG GIÁM SÁT VÀ ĐIỀU PHỐI XE BUÝT</h2>
+          <h3>Ứng dụng IoT cho định vị, giám sát và điều phối phương tiện công cộng</h3>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <div class="app-shell">
+    <main class="content-area">
+      <section class="topbar-card">
+        <div>
+          <div class="brand-chip">Bang dieu khien</div>
+          <p class="topbar-note">Chon module de truy cap nhanh vao cac chuc nang chinh cua he thong.</p>
+        </div>
+
+        <div class="user-menu-wrap">
+          <button id="userMenuButton" class="user-menu-button" type="button">
+            <span id="currentUser">user1 (admin)</span>
+          </button>
+
+          <div id="userDropdown" class="user-dropdown">
+            <a href="#" id="editProfileBtn">Chinh sua thong tin ca nhan</a>
+            <button id="logoutBtn" type="button">Dang xuat</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="hero-card">
+        <p class="eyebrow">Tong quan</p>
+        <h1>He thong quan ly xe buyt thong minh tai Ha Noi</h1>
+        <p>
+          Day la trang menu trung tam. Tu day co the di den cac module chuc nang co ban de tiep tuc
+          phat trien giao dien, API va ket noi MongoDB cho do an.
+        </p>
+      </section>
+
+      <section class="module-grid">
+        <a class="module-card" href="pages/dispatch.html">
+          <h3>Dieu phoi phuong tien</h3>
+          <p>Cap nhat trang thai xe, phan bo phuong tien va xu ly dieu chuyen.</p>
+        </a>
+
+        <a class="module-card" href="pages/monitoring.html">
+          <h3>Giam sat phuong tien</h3>
+          <p>Theo doi vi tri, toc do, trang thai ket noi va du lieu van hanh.</p>
+        </a>
+
+        <a class="module-card" href="pages/routes.html">
+          <h3>Quan ly tuyen va lo trinh</h3>
+          <p>Tao moi tuyen, cap nhat lo trinh va quan ly lich trinh hoat dong.</p>
+        </a>
+
+        <a class="module-card" href="pages/stops.html">
+          <h3>Quan ly diem dung</h3>
+          <p>Them sua xoa thong tin tram dung, vi tri va thu tu diem dung.</p>
+        </a>
+
+        <a class="module-card" href="pages/vehicles.html">
+          <h3>Quan ly phuong tien</h3>
+          <p>Quan ly danh muc loai xe, them phuong tien, theo doi nien han va trang thai van hanh.</p>
+        </a>
+
+        <a class="module-card" href="pages/users.html">
+          <h3>Quan ly nguoi dung</h3>
+          <p>Quan ly tai khoan quan tri, dieu phoi vien va phan quyen truy cap.</p>
+        </a>
+
+        <a class="module-card" href="pages/personnel.html">
+          <h3>Quan ly nhan su</h3>
+          <p>Quan ly tai xe va nhan vien phuc vu, theo doi trang thai lam viec va cap nhat ho so.</p>
+        </a>
+
+        <a class="module-card" href="pages/logs.html">
+          <h3>Log Activity</h3>
+          <p>Luu vet hanh dong, kiem tra lich su thao tac va ho tro audit.</p>
+        </a>
+      </section>
+    </main>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

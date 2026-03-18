@@ -1,0 +1,30 @@
+const express = require("express");
+const path = require("path");
+const { attachCurrentUser } = require("./middleware/auth");
+const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/users");
+const employeeRoutes = require("./routes/employees");
+const vehicleTypeRoutes = require("./routes/vehicle-types");
+const vehicleRoutes = require("./routes/vehicles");
+const routeRoutes = require("./routes/routes");
+const stopRoutes = require("./routes/stops");
+
+const app = express();
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+
+app.use("/api/auth", authRoutes);
+app.use("/api", attachCurrentUser);
+app.use("/api/users", userRoutes);
+app.use("/api/employees", employeeRoutes);
+app.use("/api/vehicle-types", vehicleTypeRoutes);
+app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/routes", routeRoutes);
+app.use("/api/stops", stopRoutes);
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+module.exports = app;

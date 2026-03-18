@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quan ly diem dung</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body class="module-body">
+  <div class="site-header-shell">
+    <header class="site-header">
+      <div class="header-left">
+        <div class="header-logos">
+          <img class="header-logo" src="../assets/images/utc_logo.png" alt="Logo Dai hoc Giao thong Van tai">
+          <img class="header-logo" src="../assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
+        </div>
+        <div class="header-copy">
+          <p>Do an Tot nghiep</p>
+          <h2>HE THONG QUAN LY XE BUYT THONG MINH</h2>
+          <h3>Ung dung IoT cho dinh vi, giam sat va dieu phoi phuong tien cong cong</h3>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <main class="module-shell">
+    <a class="back-link" href="../dashboard.html">< Quay lai dashboard</a>
+
+    <section class="route-layout stop-layout">
+      <div class="page-card route-list-card">
+        <div class="user-page-header">
+          <div>
+            <p class="eyebrow">Danh sach diem dung</p>
+            <h1>Quan ly diem dung</h1>
+            <p>Chon mot diem dung de focus ban do, hoac xem tong quan tat ca diem dung hien co.</p>
+          </div>
+
+          <div class="toolbar-actions">
+            <button id="exportStopsBtn" class="secondary-btn" type="button">Export danh sach</button>
+            <button id="openStopModalBtn" class="primary-btn" type="button">Them diem dung</button>
+          </div>
+        </div>
+
+        <p id="stopPageMessage" class="inline-message" aria-live="polite"></p>
+
+        <div class="table-wrap route-list-table">
+          <table class="data-table stop-data-table">
+            <thead>
+              <tr>
+                <th>Ma diem dung</th>
+                <th>Ten diem dung</th>
+                <th>Cac tuyen di qua</th>
+                <th>La diem dau/cuoi?</th>
+                <th>Thao tac</th>
+              </tr>
+            </thead>
+            <tbody id="stopTableBody">
+              <tr>
+                <td colspan="5">Dang tai du lieu...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page-card route-map-card">
+        <div class="user-page-header">
+          <div>
+            <p class="eyebrow">Ban do diem dung</p>
+            <h2 id="selectedStopTitle">Tat ca diem dung</h2>
+            <p id="selectedStopText">Ban do mac dinh se hien thi toan bo diem dung trong he thong.</p>
+          </div>
+        </div>
+
+        <div class="route-map-shell">
+          <div id="stopMap" class="route-map"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="stopModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 id="stopModalTitle">Them diem dung</h2>
+          <p>Nhap thong tin diem dung va chon cac tuyen xe buyt di qua vi tri nay.</p>
+        </div>
+        <button id="closeStopModalBtn" class="icon-btn" type="button">X</button>
+      </div>
+
+      <form id="stopForm" class="user-form-grid">
+        <input id="editingStopId" type="hidden">
+
+        <label class="field">
+          <span>Ma diem dung</span>
+          <input id="stopCodeInput" type="text" readonly>
+        </label>
+
+        <label class="field">
+          <span>Ten diem dung</span>
+          <input id="stopNameInput" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Vi do</span>
+          <input id="stopLatitudeInput" type="number" step="any" required>
+        </label>
+
+        <label class="field">
+          <span>Kinh do</span>
+          <input id="stopLongitudeInput" type="number" step="any" required>
+        </label>
+
+        <label class="field">
+          <span>La diem dau/cuoi?</span>
+          <select id="stopIsEndpointSelect" required>
+            <option value="false">Khong</option>
+            <option value="true">Co</option>
+          </select>
+        </label>
+
+        <div class="field">
+          <span>Cac tuyen di qua</span>
+          <div id="stopRouteCheckboxList" class="route-checkbox-grid"></div>
+        </div>
+
+        <p id="stopFormMessage" class="inline-message" aria-live="polite"></p>
+
+        <div class="modal-actions">
+          <button id="cancelStopModalBtn" class="secondary-btn" type="button">Huy</button>
+          <button class="primary-btn" type="submit">Luu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="../assets/stops.js"></script>
+</body>
+</html>

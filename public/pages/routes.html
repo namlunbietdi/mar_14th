@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quan ly tuyen va lo trinh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body class="module-body">
+  <div class="site-header-shell">
+    <header class="site-header">
+      <div class="header-left">
+        <div class="header-logos">
+          <img class="header-logo" src="../assets/images/utc_logo.png" alt="Logo Dai hoc Giao thong Van tai">
+          <img class="header-logo" src="../assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
+        </div>
+        <div class="header-copy">
+          <p>Do an Tot nghiep</p>
+          <h2>HE THONG QUAN LY XE BUYT THONG MINH</h2>
+          <h3>Ung dung IoT cho dinh vi, giam sat va dieu phoi phuong tien cong cong</h3>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <main class="module-shell">
+    <a class="back-link" href="../dashboard.html">< Quay lai dashboard</a>
+
+    <section class="route-layout">
+      <div class="page-card route-list-card">
+        <div class="user-page-header">
+          <div>
+            <p class="eyebrow">Danh sach tuyen</p>
+            <h1>Quan ly tuyen</h1>
+            <p>Chon mot tuyen de xem va cap nhat mo phong lo trinh.</p>
+          </div>
+          <button id="openRouteModalBtn" class="primary-btn" type="button">Them tuyen</button>
+        </div>
+
+        <p id="routePageMessage" class="inline-message" aria-live="polite"></p>
+
+        <div class="table-wrap route-list-table">
+          <table class="data-table route-data-table">
+            <thead>
+              <tr>
+                <th>So hieu tuyen</th>
+                <th>Ten tuyen</th>
+                <th>Diem dau</th>
+                <th>Diem cuoi</th>
+                <th>Xe van doanh</th>
+                <th>Xe du phong</th>
+                <th>Tong so xe</th>
+                <th>Thao tac</th>
+              </tr>
+            </thead>
+            <tbody id="routeTableBody">
+              <tr>
+                <td colspan="8">Dang tai du lieu...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page-card route-map-card">
+        <div class="user-page-header">
+          <div>
+            <p class="eyebrow">Lo trinh tuyen</p>
+            <h2 id="selectedRouteTitle">Chua chon tuyen</h2>
+            <p id="selectedRouteText">Hay chon mot dong o bang ben trai de xem lo trinh tren ban do.</p>
+          </div>
+        </div>
+
+        <div class="route-map-shell">
+          <div id="routeMap" class="route-map"></div>
+
+          <div class="map-overlay map-controls-card">
+            <p class="map-controls-label">Hien thi lo trinh</p>
+            <div class="map-toggle-row">
+              <button id="showBothDirectionsBtn" class="map-chip active" type="button">Ca hai</button>
+              <button id="showOutboundBtn" class="map-chip" type="button">Luot di</button>
+              <button id="showInboundBtn" class="map-chip" type="button">Luot ve</button>
+            </div>
+
+            <div class="route-legend">
+              <span><i class="legend-dot outbound"></i> Luot di</span>
+              <span><i class="legend-dot inbound"></i> Luot ve</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="routeModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 id="routeModalTitle">Them tuyen</h2>
+          <p>Nhap thong tin co ban cua tuyen xe buyt.</p>
+        </div>
+        <button id="closeRouteModalBtn" class="icon-btn" type="button">X</button>
+      </div>
+
+      <form id="routeForm" class="user-form-grid">
+        <input id="editingRouteId" type="hidden">
+
+        <label class="field">
+          <span>So hieu tuyen</span>
+          <input id="routeNumberInput" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Ten tuyen</span>
+          <input id="routeNameInput" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Diem dau</span>
+          <select id="routeStartPointInput" required></select>
+        </label>
+
+        <label class="field">
+          <span>Diem cuoi</span>
+          <select id="routeEndPointInput" required></select>
+        </label>
+
+        <label class="field">
+          <span>So xe van doanh</span>
+          <input id="routeOperatingCountInput" type="number" min="0" required>
+        </label>
+
+        <label class="field">
+          <span>So xe du phong</span>
+          <input id="routeReserveCountInput" type="number" min="0" required>
+        </label>
+
+        <label class="field">
+          <span>Mo phong luot di (GEOJSON)</span>
+          <input id="routeOutboundFileInput" type="file" accept=".json,.geojson,application/geo+json,application/json">
+        </label>
+
+        <label class="field">
+          <span>Mo phong luot ve (GEOJSON)</span>
+          <input id="routeInboundFileInput" type="file" accept=".json,.geojson,application/geo+json,application/json">
+        </label>
+
+        <p id="routeFormMessage" class="inline-message" aria-live="polite"></p>
+
+        <div class="modal-actions">
+          <button id="cancelRouteModalBtn" class="secondary-btn" type="button">Huy</button>
+          <button class="primary-btn" type="submit">Luu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="../assets/routes.js"></script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quan ly phuong tien</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body class="module-body">
+  <div class="site-header-shell">
+    <header class="site-header">
+      <div class="header-left">
+        <div class="header-logos">
+          <img class="header-logo" src="../assets/images/utc_logo.png" alt="Logo Dai hoc Giao thong Van tai">
+          <img class="header-logo" src="../assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
+        </div>
+        <div class="header-copy">
+          <p>Do an Tot nghiep</p>
+          <h2>HE THONG QUAN LY XE BUYT THONG MINH</h2>
+          <h3>Ung dung IoT cho dinh vi, giam sat va dieu phoi phuong tien cong cong</h3>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <main class="module-shell">
+    <a class="back-link" href="../dashboard.html">< Quay lai dashboard</a>
+
+    <section class="page-card user-management-card">
+      <div class="user-page-header">
+        <div>
+          <p class="eyebrow">Module Phuong tien</p>
+          <h1>Quan ly phuong tien</h1>
+          <p>Danh sach phuong tien, danh muc hang xe va loai xe phuc vu quan ly khai thac.</p>
+        </div>
+
+        <div class="toolbar-actions">
+          <button id="openVehicleTypeModalBtn" class="secondary-btn" type="button">Them/Xoa loai phuong tien</button>
+          <button id="openVehicleModalBtn" class="primary-btn" type="button">Them phuong tien</button>
+        </div>
+      </div>
+
+      <p id="vehiclePageMessage" class="inline-message" aria-live="polite"></p>
+
+      <div class="table-wrap">
+        <table class="data-table vehicle-table">
+          <thead>
+            <tr>
+              <th>Bien kiem soat</th>
+              <th>Hang xe</th>
+              <th>Loai xe</th>
+              <th>Suc chua</th>
+              <th>Thoi diem van doanh</th>
+              <th>Thoi diem het nien han</th>
+              <th>Trang thai</th>
+              <th>Thao tac</th>
+            </tr>
+          </thead>
+          <tbody id="vehicleTableBody">
+            <tr>
+              <td colspan="8">Dang tai du lieu...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="vehicleTypeModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2>Loai phuong tien</h2>
+          <p>Them hang xe, loai xe va suc chua de su dung cho danh sach phuong tien.</p>
+        </div>
+        <button id="closeVehicleTypeModalBtn" class="icon-btn" type="button">X</button>
+      </div>
+
+      <form id="vehicleTypeForm" class="user-form-grid">
+        <label class="field">
+          <span>Hang xe</span>
+          <input id="vehicleBrandInput" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Loai xe</span>
+          <input id="vehicleModelInput" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Suc chua</span>
+          <input id="vehicleCapacityInput" type="number" min="1" required>
+        </label>
+
+        <p id="vehicleTypeFormMessage" class="inline-message" aria-live="polite"></p>
+
+        <div class="modal-actions">
+          <button id="cancelVehicleTypeModalBtn" class="secondary-btn" type="button">Huy</button>
+          <button class="primary-btn" type="submit">Them loai</button>
+        </div>
+      </form>
+
+      <div class="table-wrap compact-table">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Hang xe</th>
+              <th>Loai xe</th>
+              <th>Suc chua</th>
+              <th>Thao tac</th>
+            </tr>
+          </thead>
+          <tbody id="vehicleTypeTableBody">
+            <tr>
+              <td colspan="4">Chua co loai phuong tien.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="vehicleModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 id="vehicleModalTitle">Them phuong tien</h2>
+          <p>Nhap thong tin phuong tien va chon loai xe tu danh muc da tao.</p>
+        </div>
+        <button id="closeVehicleModalBtn" class="icon-btn" type="button">X</button>
+      </div>
+
+      <form id="vehicleForm" class="user-form-grid">
+        <input id="editingVehicleId" type="hidden">
+
+        <label class="field">
+          <span>Bien kiem soat</span>
+          <input id="vehicleLicensePlateInput" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Hang xe</span>
+          <select id="vehicleBrandSelect" required></select>
+        </label>
+
+        <label class="field">
+          <span>Loai xe</span>
+          <select id="vehicleTypeSelect" required></select>
+        </label>
+
+        <label class="field">
+          <span>Suc chua</span>
+          <input id="vehicleCapacityDisplay" type="text" readonly>
+        </label>
+
+        <label class="field">
+          <span>Thoi diem van doanh</span>
+          <input id="vehicleOperationDateInput" type="date" required>
+        </label>
+
+        <label class="field">
+          <span>Trang thai</span>
+          <select id="vehicleStatusSelect" required>
+            <option value="active">Hoat dong</option>
+            <option value="maintenance">Bao tri</option>
+            <option value="stopped">Dung hoat dong</option>
+          </select>
+        </label>
+
+        <p id="vehicleFormMessage" class="inline-message" aria-live="polite"></p>
+
+        <div class="modal-actions">
+          <button id="cancelVehicleModalBtn" class="secondary-btn" type="button">Huy</button>
+          <button class="primary-btn" type="submit">Luu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="../assets/vehicles.js"></script>
+</body>
+</html>
