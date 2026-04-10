@@ -18,21 +18,166 @@
           <img class="header-logo" src="../assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
         </div>
         <div class="header-copy">
-          <p>Đồ án tốt nghiệp</p>
-          <h2>HỆ THỐNG GIÁM SÁT VÀ ĐIỀU PHỐI XE BUÝT</h2>
-          <h3>Ứng dụng IoT cho định vị, giám sát và điều phối phương tiện công cộng</h3>
+          <p>Do an Tot nghiep</p>
+          <h2>HE THONG QUAN LY XE BUYT THONG MINH</h2>
+          <h3>Ung dung IoT cho dinh vi, giam sat va dieu phoi phuong tien cong cong</h3>
         </div>
       </div>
     </header>
   </div>
 
   <main class="module-shell">
-    <a class="back-link" href="../dashboard.html">← Quay lai dashboard</a>
-    <section class="page-card">
-      <p class="eyebrow">Module 01</p>
-      <h1>Dieu phoi phuong tien</h1>
-      <p>Trang co ban de phat trien cac chuc nang dieu xe, cap nhat trang thai va xu ly su co van hanh.</p>
+    <a class="back-link" href="../dashboard.html">< Quay lai dashboard</a>
+
+    <section class="page-card user-management-card">
+      <div class="user-page-header">
+        <div>
+          <p class="eyebrow">Module Dieu phoi</p>
+          <h1>Dieu phoi phuong tien</h1>
+          <p>Tao lenh dieu phoi, phan cong xe, tai xe va gan thiet bi dinh vi cho tung lenh van hanh.</p>
+        </div>
+
+        <div class="toolbar-actions">
+          <button id="refreshDispatchBtn" class="secondary-btn" type="button">Tai lai</button>
+          <button id="openDispatchModalBtn" class="primary-btn" type="button">Them lenh dieu phoi</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-card">
+          <span class="stat-label">Tong lenh</span>
+          <strong id="dispatchTotalCount" class="stat-value">0</strong>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Dang chay</span>
+          <strong id="dispatchRunningCount" class="stat-value">0</strong>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Da gan thiet bi</span>
+          <strong id="dispatchAssignedCount" class="stat-value">0</strong>
+        </article>
+      </div>
+
+      <p id="dispatchPageMessage" class="inline-message" aria-live="polite"></p>
+
+      <div class="table-wrap">
+        <table class="data-table dispatch-table">
+          <thead>
+            <tr>
+              <th>Ma lenh</th>
+              <th>Tuyen</th>
+              <th>Xe</th>
+              <th>Tai xe</th>
+              <th>Thiet bi</th>
+              <th>Ke hoach</th>
+              <th>Trang thai</th>
+              <th>Thao tac</th>
+            </tr>
+          </thead>
+          <tbody id="dispatchTableBody">
+            <tr>
+              <td colspan="8">Dang tai du lieu...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   </main>
+
+  <div id="dispatchModal" class="modal-backdrop hidden">
+    <div class="modal-card modal-card-wide">
+      <div class="modal-header">
+        <div>
+          <h2 id="dispatchModalTitle">Them lenh dieu phoi</h2>
+          <p id="dispatchModalSubtitle">Nhap thong tin lenh dieu phoi va chon thiet bi dinh vi neu can.</p>
+        </div>
+        <button id="closeDispatchModalBtn" class="icon-btn" type="button">X</button>
+      </div>
+
+      <form id="dispatchForm" class="user-form-grid two-column-form">
+        <input id="editingDispatchId" type="hidden">
+
+        <label class="field">
+          <span>Ma lenh</span>
+          <input id="dispatchOrderCodeInput" type="text" readonly>
+        </label>
+
+        <label class="field">
+          <span>Trang thai</span>
+          <select id="dispatchStatusSelect" required>
+            <option value="planned">Ke hoach</option>
+            <option value="running">Dang chay</option>
+            <option value="completed">Hoan thanh</option>
+            <option value="cancelled">Huy</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Tuyen</span>
+          <select id="dispatchRouteSelect" required></select>
+        </label>
+
+        <label class="field">
+          <span>Phuong tien</span>
+          <select id="dispatchVehicleSelect" required></select>
+        </label>
+
+        <label class="field">
+          <span>Tai xe</span>
+          <select id="dispatchDriverSelect" required></select>
+        </label>
+
+        <label class="field">
+          <span>Phu xe</span>
+          <select id="dispatchConductorSelect"></select>
+        </label>
+
+        <label class="field">
+          <span>Thiet bi dinh vi</span>
+          <select id="dispatchDeviceSelect"></select>
+        </label>
+
+        <label class="field">
+          <span>Ghi chu gan thiet bi</span>
+          <input id="dispatchAssignmentNoteInput" type="text" placeholder="Vi du: Gan cho ca sang">
+        </label>
+
+        <label class="field">
+          <span>Bat dau ke hoach</span>
+          <input id="dispatchPlannedStartInput" type="datetime-local" required>
+        </label>
+
+        <label class="field">
+          <span>Ket thuc ke hoach</span>
+          <input id="dispatchPlannedEndInput" type="datetime-local" required>
+        </label>
+
+        <label class="field">
+          <span>Bat dau thuc te</span>
+          <input id="dispatchActualStartInput" type="datetime-local">
+        </label>
+
+        <label class="field">
+          <span>Ket thuc thuc te</span>
+          <input id="dispatchActualEndInput" type="datetime-local">
+        </label>
+
+        <label class="field field-span-2">
+          <span>Ghi chu lenh</span>
+          <input id="dispatchNoteInput" type="text" placeholder="Them ghi chu dieu xe neu can">
+        </label>
+
+        <p id="dispatchFormMessage" class="inline-message field-span-2" aria-live="polite"></p>
+
+        <div class="modal-actions field-span-2">
+          <button id="cancelDispatchModalBtn" class="secondary-btn" type="button">Huy</button>
+          <button class="primary-btn" type="submit">Luu lenh</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="../assets/dispatch.js"></script>
 </body>
 </html>

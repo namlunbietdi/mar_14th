@@ -32,9 +32,27 @@ async function peekNextStopCode() {
   return `HBS${String(nextSeq).padStart(4, "0")}`;
 }
 
+async function getNextDispatchOrderCode() {
+  const counter = await Counter.findByIdAndUpdate(
+    "dispatch_order_code",
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+
+  return `LENH${String(counter.seq - 1).padStart(5, "0")}`;
+}
+
+async function peekNextDispatchOrderCode() {
+  const counter = await Counter.findById("dispatch_order_code");
+  const nextSeq = counter ? counter.seq : 0;
+  return `LENH${String(nextSeq).padStart(5, "0")}`;
+}
+
 module.exports = {
+  getNextDispatchOrderCode,
   getNextEmployeeCode,
   getNextStopCode,
+  peekNextDispatchOrderCode,
   peekNextEmployeeCode,
   peekNextStopCode
 };

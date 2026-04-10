@@ -121,6 +121,8 @@ function renderRouteCheckboxes(selectedRouteIds = []) {
       </div>
     `)
     .join("");
+
+  updateRouteDirectionConstraints();
 }
 
 function getCheckedRouteDirections() {
@@ -144,6 +146,54 @@ function getCheckedRouteDirections() {
   });
 
   return [...groupedRoutes.values()].filter((item) => item.outbound || item.inbound);
+}
+
+function updateRouteDirectionConstraints(changedCheckbox = null) {
+  const isEndpoint = stopIsEndpointSelect.value === "true";
+  const routeGroups = new Map();
+
+  [...stopRouteCheckboxList.querySelectorAll('input[type="checkbox"]')].forEach((checkbox) => {
+    const routeId = checkbox.dataset.routeId;
+
+    if (!routeGroups.has(routeId)) {
+      routeGroups.set(routeId, []);
+    }
+
+    routeGroups.get(routeId).push(checkbox);
+  });
+
+  routeGroups.forEach((checkboxes) => {
+    const checkedBoxes = checkboxes.filter((checkbox) => checkbox.checked);
+
+    if (isEndpoint) {
+      checkboxes.forEach((checkbox) => {
+        checkbox.disabled = false;
+      });
+      return;
+    }
+
+    if (checkedBoxes.length > 1) {
+      const checkboxToKeep = changedCheckbox && checkboxes.includes(changedCheckbox)
+        ? changedCheckbox
+        : checkedBoxes[0];
+
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = checkbox === checkboxToKeep;
+      });
+    }
+
+    const activeCheckbox = checkboxes.find((checkbox) => checkbox.checked);
+
+    if (activeCheckbox) {
+      checkboxes.forEach((checkbox) => {
+        checkbox.disabled = checkbox !== activeCheckbox;
+      });
+    } else {
+      checkboxes.forEach((checkbox) => {
+        checkbox.disabled = false;
+      });
+    }
+  });
 }
 
 function clearStopMarkers() {
@@ -262,6 +312,16 @@ stopModal?.addEventListener("click", (event) => {
   if (event.target === stopModal) closeStopModal();
 });
 
+stopIsEndpointSelect?.addEventListener("change", () => {
+  updateRouteDirectionConstraints();
+});
+
+stopRouteCheckboxList?.addEventListener("change", (event) => {
+  const checkbox = event.target.closest('input[type="checkbox"]');
+  if (!checkbox) return;
+  updateRouteDirectionConstraints(checkbox);
+});
+
 stopTableBody?.addEventListener("click", async (event) => {
   const row = event.target.closest("tr[data-stop-id]");
   if (row) {
@@ -297,6 +357,8 @@ stopTableBody?.addEventListener("click", async (event) => {
 stopForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   try {
+    updateRouteDirectionConstraints();
+
     const payload = {
       stopName: stopNameInput.value.trim(),
       longitude: Number(stopLongitudeInput.value),

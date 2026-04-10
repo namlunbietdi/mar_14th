@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quan ly thiet bi giam sat hanh trinh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body class="module-body">
+  <div class="site-header-shell">
+    <header class="site-header">
+      <div class="header-left">
+        <div class="header-logos">
+          <img class="header-logo" src="../assets/images/utc_logo.png" alt="Logo Dai hoc Giao thong Van tai">
+          <img class="header-logo" src="../assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
+        </div>
+        <div class="header-copy">
+          <p>Do an Tot nghiep</p>
+          <h2>HE THONG QUAN LY XE BUYT THONG MINH</h2>
+          <h3>Ung dung IoT cho dinh vi, giam sat va dieu phoi phuong tien cong cong</h3>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <main class="module-shell">
+    <a class="back-link" href="../dashboard.html">< Quay lai dashboard</a>
+
+    <section class="page-card user-management-card">
+      <div class="user-page-header">
+        <div>
+          <p class="eyebrow">Module Thiet bi</p>
+          <h1>Quan ly thiet bi giam sat hanh trinh</h1>
+          <p>Quan ly danh sach thiet bi theo ID de san sang gan lai cho phuong tien khac khi can dieu dong.</p>
+        </div>
+
+        <button id="openDeviceModalBtn" class="primary-btn" type="button">Them thiet bi</button>
+      </div>
+
+      <p id="devicePageMessage" class="inline-message" aria-live="polite"></p>
+
+      <div class="table-wrap">
+        <table class="data-table device-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Ngay bat dau van doanh</th>
+              <th>Nien han con lai</th>
+              <th>Thoi gian bao tri ke tiep</th>
+              <th>Trang thai</th>
+              <th>Thao tac</th>
+            </tr>
+          </thead>
+          <tbody id="deviceTableBody">
+            <tr>
+              <td colspan="6">Dang tai du lieu...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="deviceModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 id="deviceModalTitle">Them thiet bi</h2>
+          <p>Nhap ID, ngay bat dau van doanh va trang thai cua thiet bi.</p>
+        </div>
+        <button id="closeDeviceModalBtn" class="icon-btn" type="button">X</button>
+      </div>
+
+      <form id="deviceForm" class="user-form-grid">
+        <input id="editingDeviceId" type="hidden">
+
+        <label class="field">
+          <span>ID thiet bi</span>
+          <input id="deviceIdInput" type="text" required>
+        </label>
+
+        <label class="field">
+          <span>Ngay bat dau van doanh</span>
+          <input id="deviceOperationStartDateInput" type="date" required>
+        </label>
+
+        <label class="field">
+          <span>Trang thai</span>
+          <select id="deviceStatusSelect" required>
+            <option value="working">Lam viec</option>
+            <option value="issue">Tro ngai</option>
+            <option value="removed">Loai bo</option>
+          </select>
+        </label>
+
+        <p id="deviceFormHint" class="form-hint">Bao tri ke tiep duoc tinh tu dong sau 7 ngay ke tu thoi diem tao ban ghi.</p>
+        <p id="deviceFormMessage" class="inline-message" aria-live="polite"></p>
+
+        <div class="modal-actions">
+          <button id="cancelDeviceModalBtn" class="secondary-btn" type="button">Huy</button>
+          <button class="primary-btn" type="submit">Luu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../assets/app.js"></script>
+  <script src="../assets/devices.js"></script>
+</body>
+</html>

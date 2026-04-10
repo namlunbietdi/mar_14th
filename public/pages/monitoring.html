@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <link rel="stylesheet" href="../assets/styles.css">
 </head>
 <body class="module-body">
@@ -18,21 +19,87 @@
           <img class="header-logo" src="../assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
         </div>
         <div class="header-copy">
-          <p>Đồ án tốt nghiệp</p>
-          <h2>HỆ THỐNG GIÁM SÁT VÀ ĐIỀU PHỐI XE BUÝT</h2>
-          <h3>Ứng dụng IoT cho định vị, giám sát và điều phối phương tiện công cộng</h3>
+          <p>Do an Tot nghiep</p>
+          <h2>HE THONG QUAN LY XE BUYT THONG MINH</h2>
+          <h3>Ung dung IoT cho dinh vi, giam sat va dieu phoi phuong tien cong cong</h3>
         </div>
       </div>
     </header>
   </div>
 
   <main class="module-shell">
-    <a class="back-link" href="../dashboard.html">← Quay lai dashboard</a>
-    <section class="page-card">
-      <p class="eyebrow">Module 02</p>
-      <h1>Giam sat phuong tien</h1>
-      <p>Trang co ban de them ban do, danh sach xe dang hoat dong va so lieu giam sat thoi gian thuc.</p>
+    <a class="back-link" href="../dashboard.html">< Quay lai dashboard</a>
+
+    <section class="route-layout">
+      <div class="page-card route-list-card">
+        <div class="user-page-header">
+          <div>
+            <p class="eyebrow">Phuong tien dang co GPS</p>
+            <h1>Giam sat phuong tien</h1>
+            <p>Theo doi vi tri truc tiep cua cac phuong tien dang gui du lieu GPS ve he thong.</p>
+          </div>
+
+          <div class="toolbar-actions">
+            <button id="refreshMonitoringBtn" class="secondary-btn" type="button">Tai lai</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <span class="stat-label">Tong phuong tien</span>
+            <strong id="monitoringTotalCount" class="stat-value">0</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Online</span>
+            <strong id="monitoringOnlineCount" class="stat-value">0</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Offline</span>
+            <strong id="monitoringOfflineCount" class="stat-value">0</strong>
+          </article>
+        </div>
+
+        <p id="monitoringPageMessage" class="inline-message" aria-live="polite"></p>
+
+        <div class="table-wrap route-list-table">
+          <table class="data-table route-data-table monitoring-list-table">
+            <thead>
+              <tr>
+                <th>Xe</th>
+                <th>Thiet bi</th>
+                <th>Tuyen</th>
+                <th>Toc do</th>
+                <th>Lan nhan cuoi</th>
+                <th>Trang thai</th>
+              </tr>
+            </thead>
+            <tbody id="monitoringTableBody">
+              <tr>
+                <td colspan="6">Dang tai du lieu...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page-card route-map-card">
+        <div class="user-page-header">
+          <div>
+            <p class="eyebrow">Ban do giam sat</p>
+            <h2 id="selectedMonitoringTitle">Tat ca phuong tien</h2>
+            <p id="selectedMonitoringText">Ban do dang hien thi tat ca phuong tien co tin hieu GPS gan nhat.</p>
+          </div>
+        </div>
+
+        <div class="route-map-shell">
+          <div id="monitoringMap" class="route-map"></div>
+        </div>
+      </div>
     </section>
   </main>
+
+  <script src="../assets/app.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="../assets/monitoring.js"></script>
 </body>
 </html>

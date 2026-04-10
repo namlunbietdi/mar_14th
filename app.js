@@ -6,6 +6,9 @@ const userRoutes = require("./routes/users");
 const employeeRoutes = require("./routes/employees");
 const vehicleTypeRoutes = require("./routes/vehicle-types");
 const vehicleRoutes = require("./routes/vehicles");
+const deviceRoutes = require("./routes/devices");
+const dispatchOrderRoutes = require("./routes/dispatch-orders");
+const monitoringRoutes = require("./routes/monitoring");
 const routeRoutes = require("./routes/routes");
 const stopRoutes = require("./routes/stops");
 
@@ -20,6 +23,9 @@ app.use("/api/users", userRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/vehicle-types", vehicleTypeRoutes);
 app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/devices", deviceRoutes);
+app.use("/api/dispatch-orders", dispatchOrderRoutes);
+app.use("/api/monitoring", monitoringRoutes);
 app.use("/api/routes", routeRoutes);
 app.use("/api/stops", stopRoutes);
 

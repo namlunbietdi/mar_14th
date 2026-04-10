@@ -413,6 +413,18 @@ h1 {
   min-width: 1080px;
 }
 
+.dispatch-table {
+  min-width: 1200px;
+}
+
+.monitoring-list-table {
+  min-width: 100%;
+}
+
+.device-table {
+  min-width: 920px;
+}
+
 .data-table th,
 .data-table td {
   padding: 16px 18px;
@@ -508,6 +520,11 @@ h1 {
   color: #b71c1c;
 }
 
+.status-badge.warning {
+  background: rgba(217, 119, 6, 0.14);
+  color: #b45309;
+}
+
 .inline-message {
   min-height: 24px;
   margin: 0;
@@ -580,10 +597,56 @@ h1 {
   gap: 16px;
 }
 
+.two-column-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-span-2 {
+  grid-column: 1 / -1;
+}
+
+.modal-card-wide {
+  width: min(960px, calc(100vw - 48px));
+  max-height: min(90vh, 920px);
+  overflow: auto;
+}
+
 .form-hint {
   margin: 0;
   color: var(--muted);
   font-size: 14px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stat-card,
+.nested-card {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.stat-card {
+  display: grid;
+  gap: 8px;
+}
+
+.stat-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.stat-value {
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  color: var(--primary-dark);
 }
 
 .route-checkbox-grid {
@@ -873,6 +936,11 @@ h1 {
   .modal-header,
   .modal-actions {
     flex-direction: column;
+  }
+
+  .stats-grid,
+  .two-column-form {
+    grid-template-columns: 1fr;
   }
 
   .toolbar-actions {
