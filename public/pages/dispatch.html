@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dieu phoi phuong tien</title>
+  <title>Điều phối phương tiện</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,28 +18,28 @@
           <img class="header-logo" src="../assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
         </div>
         <div class="header-copy">
-          <p>Do an Tot nghiep</p>
-          <h2>HE THONG QUAN LY XE BUYT THONG MINH</h2>
-          <h3>Ung dung IoT cho dinh vi, giam sat va dieu phoi phuong tien cong cong</h3>
+          <p>Đồ án Tốt nghiệp</p>
+          <h2>HỆ THỐNG QUẢN LÝ XE BUÝT THÔNG MINH</h2>
+          <h3>Ứng dụng IoT cho định vị, giám sát và điều phối phương tiện công cộng</h3>
         </div>
       </div>
     </header>
   </div>
 
   <main class="module-shell">
-    <a class="back-link" href="../dashboard.html">< Quay lai dashboard</a>
+    <a class="back-link" href="../dashboard.html">< Quay lại dashboard</a>
 
     <section class="page-card user-management-card">
       <div class="user-page-header">
         <div>
-          <p class="eyebrow">Module Dieu phoi</p>
-          <h1>Dieu phoi phuong tien</h1>
-          <p>Tao lenh dieu phoi, phan cong xe, tai xe va gan thiet bi dinh vi cho tung lenh van hanh.</p>
+          <p class="eyebrow">Module Điều phối</p>
+          <h1>Điều phối phương tiện</h1>
+          <p>Tao lenh điều phối, phan cong xe, tai xe va gan thiết bị định vị cho tung lenh van hanh.</p>
         </div>
 
         <div class="toolbar-actions">
           <button id="refreshDispatchBtn" class="secondary-btn" type="button">Tai lai</button>
-          <button id="openDispatchModalBtn" class="primary-btn" type="button">Them lenh dieu phoi</button>
+          <button id="openDispatchModalBtn" class="primary-btn" type="button">Them lenh điều phối</button>
         </div>
       </div>
 
@@ -49,11 +49,11 @@
           <strong id="dispatchTotalCount" class="stat-value">0</strong>
         </article>
         <article class="stat-card">
-          <span class="stat-label">Dang chay</span>
+          <span class="stat-label">Đang chạy</span>
           <strong id="dispatchRunningCount" class="stat-value">0</strong>
         </article>
         <article class="stat-card">
-          <span class="stat-label">Da gan thiet bi</span>
+          <span class="stat-label">Da gan thiết bị</span>
           <strong id="dispatchAssignedCount" class="stat-value">0</strong>
         </article>
       </div>
@@ -65,10 +65,10 @@
           <thead>
             <tr>
               <th>Ma lenh</th>
-              <th>Tuyen</th>
+              <th>Tuyến</th>
               <th>Xe</th>
               <th>Tai xe</th>
-              <th>Thiet bi</th>
+              <th>Thiết bị</th>
               <th>Ke hoach</th>
               <th>Trang thai</th>
               <th>Thao tac</th>
@@ -76,7 +76,7 @@
           </thead>
           <tbody id="dispatchTableBody">
             <tr>
-              <td colspan="8">Dang tai du lieu...</td>
+              <td colspan="8">Đang tải du lieu...</td>
             </tr>
           </tbody>
         </table>
@@ -88,8 +88,8 @@
     <div class="modal-card modal-card-wide">
       <div class="modal-header">
         <div>
-          <h2 id="dispatchModalTitle">Them lenh dieu phoi</h2>
-          <p id="dispatchModalSubtitle">Nhap thong tin lenh dieu phoi va chon thiet bi dinh vi neu can.</p>
+          <h2 id="dispatchModalTitle">Them lenh điều phối</h2>
+          <p id="dispatchModalSubtitle">Nhap thông tin lenh điều phối va chon thiết bị định vị neu can.</p>
         </div>
         <button id="closeDispatchModalBtn" class="icon-btn" type="button">X</button>
       </div>
@@ -106,19 +106,19 @@
           <span>Trang thai</span>
           <select id="dispatchStatusSelect" required>
             <option value="planned">Ke hoach</option>
-            <option value="running">Dang chay</option>
+            <option value="running">Đang chạy</option>
             <option value="completed">Hoan thanh</option>
             <option value="cancelled">Huy</option>
           </select>
         </label>
 
         <label class="field">
-          <span>Tuyen</span>
+          <span>Tuyến</span>
           <select id="dispatchRouteSelect" required></select>
         </label>
 
         <label class="field">
-          <span>Phuong tien</span>
+          <span>Phương tiện</span>
           <select id="dispatchVehicleSelect" required></select>
         </label>
 
@@ -133,12 +133,12 @@
         </label>
 
         <label class="field">
-          <span>Thiet bi dinh vi</span>
+          <span>Thiết bị định vị</span>
           <select id="dispatchDeviceSelect"></select>
         </label>
 
         <label class="field">
-          <span>Ghi chu gan thiet bi</span>
+          <span>Ghi chu gan thiết bị</span>
           <input id="dispatchAssignmentNoteInput" type="text" placeholder="Vi du: Gan cho ca sang">
         </label>
 
@@ -181,3 +181,4 @@
   <script src="../assets/dispatch.js"></script>
 </body>
 </html>
+

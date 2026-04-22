@@ -1,4 +1,4 @@
-const currentRouteUser = window.busApp?.getStoredUser();
+﻿const currentRouteUser = window.busApp?.getStoredUser();
 const routeTableBody = document.getElementById("routeTableBody");
 const routePageMessage = document.getElementById("routePageMessage");
 const openRouteModalBtn = document.getElementById("openRouteModalBtn");
@@ -22,6 +22,16 @@ const selectedRouteText = document.getElementById("selectedRouteText");
 const showBothDirectionsBtn = document.getElementById("showBothDirectionsBtn");
 const showOutboundBtn = document.getElementById("showOutboundBtn");
 const showInboundBtn = document.getElementById("showInboundBtn");
+const editorOutboundBtn = document.getElementById("editorOutboundBtn");
+const editorInboundBtn = document.getElementById("editorInboundBtn");
+const directionEditorMessage = document.getElementById("directionEditorMessage");
+const directionStopSelect = document.getElementById("directionStopSelect");
+const addDirectionStopBtn = document.getElementById("addDirectionStopBtn");
+const saveDirectionBtn = document.getElementById("saveDirectionBtn");
+const directionOrderBody = document.getElementById("directionOrderBody");
+const previewRuntimeBtn = document.getElementById("previewRuntimeBtn");
+const downloadRuntimeBtn = document.getElementById("downloadRuntimeBtn");
+const runtimePreview = document.getElementById("runtimePreview");
 
 let routes = [];
 let selectedRouteId = "";
@@ -31,9 +41,16 @@ let inboundLayer = null;
 let endpointStops = [];
 let allStops = [];
 let routeStopMarkers = [];
+let editorDirection = "outbound";
+let routeDirectionState = { outbound: [], inbound: [] };
+let draggedDirectionIndex = null;
 
-if (currentRouteUser?.role !== "admin") {
+const canManageRoutes = currentRouteUser?.role === "admin";
+
+if (!canManageRoutes) {
   openRouteModalBtn.style.display = "none";
+  addDirectionStopBtn.disabled = true;
+  saveDirectionBtn.disabled = true;
 }
 
 const routeMap = L.map("routeMap").setView([21.0285, 105.8542], 12);
@@ -66,10 +83,20 @@ function setRouteFormMessage(message, type = "") {
   routeFormMessage.className = `inline-message ${type}`.trim();
 }
 
+function setDirectionEditorMessage(message, type = "") {
+  directionEditorMessage.textContent = message;
+  directionEditorMessage.className = `inline-message ${type}`.trim();
+}
+
 function updateDirectionButtons() {
   showBothDirectionsBtn.classList.toggle("active", displayDirection === "both");
   showOutboundBtn.classList.toggle("active", displayDirection === "outbound");
   showInboundBtn.classList.toggle("active", displayDirection === "inbound");
+}
+
+function updateEditorDirectionButtons() {
+  editorOutboundBtn.classList.toggle("active", editorDirection === "outbound");
+  editorInboundBtn.classList.toggle("active", editorDirection === "inbound");
 }
 
 function closeRouteModal() {
@@ -94,7 +121,7 @@ function renderEndpointOptions(selectedStartPoint = "", selectedEndPoint = "") {
 }
 
 function openRouteModal(mode, route = null) {
-  if (currentRouteUser?.role !== "admin") return;
+  if (!canManageRoutes) return;
   routeForm.reset();
   setRouteFormMessage("");
   editingRouteId.value = route?.id || "";
@@ -207,7 +234,6 @@ function renderRoutes() {
     return;
   }
 
-  const canManage = currentRouteUser?.role === "admin";
   routeTableBody.innerHTML = routes
     .map((route) => `
       <tr class="${route.id === selectedRouteId ? "selected-row" : ""}" data-route-id="${route.id}">
@@ -218,13 +244,204 @@ function renderRoutes() {
         <td>${route.operatingVehicleCount}</td>
         <td>${route.reserveVehicleCount}</td>
         <td>${route.totalVehicleCount}</td>
-        <td>${canManage ? `<div class="action-group"><button class="link-btn" type="button" data-action="edit-route" data-id="${route.id}">Sua</button><button class="link-btn danger" type="button" data-action="delete-route" data-id="${route.id}">Xoa</button></div>` : '<span class="muted-text">Khong co quyen</span>'}</td>
+        <td>${canManageRoutes ? `<div class="action-group"><button class="link-btn" type="button" data-action="edit-route" data-id="${route.id}">Sua</button><button class="link-btn danger" type="button" data-action="delete-route" data-id="${route.id}">Xoa</button></div>` : '<span class="muted-text">Khong co quyen</span>'}</td>
       </tr>
     `)
     .join("");
 
   const selectedRoute = routes.find((route) => route.id === selectedRouteId) || null;
   renderRouteMap(selectedRoute);
+}
+
+function renderDirectionStopSelect() {
+  const options = allStops
+    .map((stop) => `<option value="${stop.id}">${stop.stopCode} - ${stop.stopName}</option>`)
+    .join("");
+  directionStopSelect.innerHTML = options || '<option value="">Khong co diem dung</option>';
+}
+
+function getCurrentDirectionStops() {
+  return routeDirectionState[editorDirection] || [];
+}
+
+function clearDirectionDropIndicators() {
+  directionOrderBody.querySelectorAll(".direction-drop-target").forEach((row) => {
+    row.classList.remove("direction-drop-target");
+  });
+}
+
+function moveDirectionStop(fromIndex, toIndex) {
+  const stops = getCurrentDirectionStops();
+  if (!Number.isFinite(fromIndex) || !Number.isFinite(toIndex)) return;
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= stops.length || toIndex >= stops.length) return;
+  if (fromIndex === toIndex) return;
+
+  const [movingStop] = stops.splice(fromIndex, 1);
+  stops.splice(toIndex, 0, movingStop);
+  renderDirectionTable();
+}
+
+function renderDirectionTable() {
+  if (!selectedRouteId) {
+    directionOrderBody.innerHTML = `<tr><td colspan="7">Chon mot tuyen de quan ly thu tu diem dung.</td></tr>`;
+    return;
+  }
+
+  const stops = getCurrentDirectionStops();
+  if (!stops.length) {
+    directionOrderBody.innerHTML = `<tr><td colspan="7">Chua co diem dung nao trong huong nay.</td></tr>`;
+    return;
+  }
+
+  directionOrderBody.innerHTML = stops
+    .map((stop, index) => `
+      <tr data-index="${index}" class="${canManageRoutes ? "direction-draggable-row" : ""}">
+        <td>${index + 1}</td>
+        <td>${stop.stopCode || "-"}</td>
+        <td>${stop.stopName || "-"}</td>
+        <td><input class="direction-audio-input" data-index="${index}" type="text" value="${stop.audioId || ""}" ${canManageRoutes ? "" : "disabled"}></td>
+        <td><input class="direction-terminal-checkbox" data-index="${index}" type="checkbox" ${stop.isTerminal ? "checked" : ""} ${canManageRoutes ? "" : "disabled"}></td>
+        <td>${canManageRoutes ? `<span class="direction-drag-handle" draggable="true" data-index="${index}" title="Keo de doi thu tu">↕ Keo</span>` : '<span class="muted-text">Khong co quyen</span>'}</td>
+        <td><button class="link-btn danger" type="button" data-action="remove-stop" data-index="${index}" ${canManageRoutes ? "" : "disabled"}>Xoa</button></td>
+      </tr>
+    `)
+    .join("");
+}
+
+async function loadRouteDirection(direction) {
+  if (!selectedRouteId) return;
+  const response = await window.busApp.authFetch(`/api/route-directions/${selectedRouteId}/${direction}`);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the tai thu tu diem dung.");
+  }
+
+  routeDirectionState[direction] = (data.direction.stops || []).map((item, index) => ({
+    stopId: item.stopId,
+    stopCode: item.stopCode,
+    stopName: item.stopName,
+    audioId: item.audioId || item.stopCode || "",
+    isTerminal: Boolean(item.isTerminal),
+    order: Number(item.order || index + 1)
+  }));
+}
+
+async function loadDirectionEditor() {
+  if (!selectedRouteId) {
+    routeDirectionState = { outbound: [], inbound: [] };
+    renderDirectionTable();
+    return;
+  }
+
+  setDirectionEditorMessage("Dang tai cau hinh diem dung...");
+  try {
+    await Promise.all([loadRouteDirection("outbound"), loadRouteDirection("inbound")]);
+    setDirectionEditorMessage("Da tai cau hinh diem dung.", "success");
+    renderDirectionTable();
+  } catch (error) {
+    setDirectionEditorMessage(error.message, "error");
+    renderDirectionTable();
+  }
+}
+
+async function saveDirectionStops() {
+  if (!canManageRoutes) return;
+  if (!selectedRouteId) {
+    setDirectionEditorMessage("Vui long chon tuyen truoc khi luu.", "error");
+    return;
+  }
+
+  const payloadStops = getCurrentDirectionStops().map((item, index) => ({
+    stopId: item.stopId,
+    order: index + 1,
+    isTerminal: Boolean(item.isTerminal),
+    audioId: String(item.audioId || "").trim()
+  }));
+
+  try {
+    const response = await window.busApp.authFetch(`/api/route-directions/${selectedRouteId}/${editorDirection}`, {
+      method: "PUT",
+      body: JSON.stringify({ stops: payloadStops })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Khong the luu thu tu diem dung.");
+    routeDirectionState[editorDirection] = (data.direction.stops || []).map((item, index) => ({
+      stopId: item.stopId,
+      stopCode: item.stopCode,
+      stopName: item.stopName,
+      audioId: item.audioId || item.stopCode || "",
+      isTerminal: Boolean(item.isTerminal),
+      order: Number(item.order || index + 1)
+    }));
+    renderDirectionTable();
+    setDirectionEditorMessage(data.message, "success");
+  } catch (error) {
+    setDirectionEditorMessage(error.message, "error");
+  }
+}
+
+function addStopToDirection() {
+  if (!canManageRoutes) return;
+  if (!selectedRouteId) {
+    setDirectionEditorMessage("Vui long chon tuyen truoc.", "error");
+    return;
+  }
+
+  const stopId = directionStopSelect.value;
+  if (!stopId) return;
+  const stop = allStops.find((item) => item.id === stopId);
+  if (!stop) return;
+
+  const stops = getCurrentDirectionStops();
+  if (stops.some((item) => item.stopId === stopId)) {
+    setDirectionEditorMessage("Diem dung da ton tai trong huong nay.", "error");
+    return;
+  }
+
+  stops.push({
+    stopId: stop.id,
+    stopCode: stop.stopCode,
+    stopName: stop.stopName,
+    audioId: stop.stopCode || "",
+    isTerminal: false,
+    order: stops.length + 1
+  });
+  renderDirectionTable();
+  setDirectionEditorMessage("Da them diem dung vao danh sach.", "success");
+}
+
+async function previewRuntimeConfig(download = false) {
+  if (!selectedRouteId) {
+    setDirectionEditorMessage("Vui long chon mot tuyen.", "error");
+    return;
+  }
+
+  try {
+    const response = await window.busApp.authFetch(`/api/routes/${selectedRouteId}/runtime-config`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Khong the tai runtime config.");
+    const jsonContent = JSON.stringify(data.config, null, 2);
+
+    if (download) {
+      const blob = new Blob([jsonContent], { type: "application/json;charset=utf-8;" });
+      const route = routes.find((item) => item.id === selectedRouteId);
+      const routeTag = route?.routeNumber || "route";
+      const anchor = document.createElement("a");
+      anchor.href = window.URL.createObjectURL(blob);
+      anchor.download = `runtime-config-${routeTag}.json`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setDirectionEditorMessage("Da tai runtime config.", "success");
+      return;
+    }
+
+    runtimePreview.textContent = jsonContent;
+    runtimePreview.classList.remove("hidden");
+    setDirectionEditorMessage("Da tai runtime config.", "success");
+  } catch (error) {
+    setDirectionEditorMessage(error.message, "error");
+  }
 }
 
 async function loadRoutes() {
@@ -242,8 +459,15 @@ async function loadRoutes() {
     routes = routesData.routes;
     allStops = stopsData.stops;
     endpointStops = allStops.filter((stop) => stop.isEndpoint);
+    renderDirectionStopSelect();
     renderRoutes();
     setRoutePageMessage(`Da tai ${routes.length} tuyen.`, "success");
+
+    if (selectedRouteId) {
+      await loadDirectionEditor();
+    } else {
+      renderDirectionTable();
+    }
   } catch (error) {
     routeTableBody.innerHTML = `<tr><td colspan="8">${error.message}</td></tr>`;
     setRoutePageMessage(error.message, "error");
@@ -254,7 +478,9 @@ routeTableBody?.addEventListener("click", async (event) => {
   const row = event.target.closest("tr[data-route-id]");
   if (row) {
     selectedRouteId = row.dataset.routeId;
+    runtimePreview.classList.add("hidden");
     renderRoutes();
+    await loadDirectionEditor();
   }
 
   const action = event.target.dataset.action;
@@ -272,12 +498,101 @@ routeTableBody?.addEventListener("click", async (event) => {
       const response = await window.busApp.authFetch(`/api/routes/${routeId}`, { method: "DELETE" });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Khong the xoa tuyen.");
-      if (selectedRouteId === routeId) selectedRouteId = "";
+      if (selectedRouteId === routeId) {
+        selectedRouteId = "";
+        routeDirectionState = { outbound: [], inbound: [] };
+      }
       setRoutePageMessage(data.message, "success");
       await loadRoutes();
     } catch (error) {
       setRoutePageMessage(error.message, "error");
     }
+  }
+});
+
+directionOrderBody?.addEventListener("click", (event) => {
+  const action = event.target.dataset.action;
+  const index = Number(event.target.dataset.index);
+  if (!action || !Number.isFinite(index) || !canManageRoutes) return;
+  const stops = getCurrentDirectionStops();
+
+  if (action === "remove-stop") {
+    stops.splice(index, 1);
+  }
+
+  renderDirectionTable();
+});
+
+directionOrderBody?.addEventListener("dragstart", (event) => {
+  if (!canManageRoutes) return;
+  const handle = event.target.closest(".direction-drag-handle");
+  if (!handle) return;
+
+  draggedDirectionIndex = Number(handle.dataset.index);
+  if (!Number.isFinite(draggedDirectionIndex)) return;
+
+  const row = handle.closest("tr[data-index]");
+  row?.classList.add("direction-dragging");
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", String(draggedDirectionIndex));
+});
+
+directionOrderBody?.addEventListener("dragover", (event) => {
+  if (!canManageRoutes || draggedDirectionIndex === null) return;
+  const row = event.target.closest("tr[data-index]");
+  if (!row) return;
+
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+  clearDirectionDropIndicators();
+  row.classList.add("direction-drop-target");
+});
+
+directionOrderBody?.addEventListener("drop", (event) => {
+  if (!canManageRoutes) return;
+  const row = event.target.closest("tr[data-index]");
+  if (!row || draggedDirectionIndex === null) return;
+
+  event.preventDefault();
+  const dropIndex = Number(row.dataset.index);
+  if (!Number.isFinite(dropIndex)) return;
+  moveDirectionStop(draggedDirectionIndex, dropIndex);
+  setDirectionEditorMessage("Da cap nhat thu tu bang keo tha. Nhan 'Luu thu tu' de luu len he thong.", "success");
+  draggedDirectionIndex = null;
+  clearDirectionDropIndicators();
+});
+
+directionOrderBody?.addEventListener("dragend", () => {
+  draggedDirectionIndex = null;
+  clearDirectionDropIndicators();
+  directionOrderBody.querySelectorAll(".direction-dragging").forEach((row) => {
+    row.classList.remove("direction-dragging");
+  });
+});
+
+directionOrderBody?.addEventListener("input", (event) => {
+  if (!canManageRoutes) return;
+  const index = Number(event.target.dataset.index);
+  if (!Number.isFinite(index)) return;
+  const stops = getCurrentDirectionStops();
+  const item = stops[index];
+  if (!item) return;
+
+  if (event.target.classList.contains("direction-audio-input")) {
+    item.audioId = event.target.value;
+  }
+});
+
+directionOrderBody?.addEventListener("change", (event) => {
+  if (!canManageRoutes) return;
+  const index = Number(event.target.dataset.index);
+  if (!Number.isFinite(index)) return;
+  const stops = getCurrentDirectionStops();
+  const item = stops[index];
+  if (!item) return;
+
+  if (event.target.classList.contains("direction-terminal-checkbox")) {
+    item.isTerminal = event.target.checked;
   }
 });
 
@@ -365,5 +680,23 @@ showInboundBtn?.addEventListener("click", () => {
   renderRouteMap(routes.find((route) => route.id === selectedRouteId));
 });
 
+editorOutboundBtn?.addEventListener("click", () => {
+  editorDirection = "outbound";
+  updateEditorDirectionButtons();
+  renderDirectionTable();
+});
+
+editorInboundBtn?.addEventListener("click", () => {
+  editorDirection = "inbound";
+  updateEditorDirectionButtons();
+  renderDirectionTable();
+});
+
+addDirectionStopBtn?.addEventListener("click", addStopToDirection);
+saveDirectionBtn?.addEventListener("click", saveDirectionStops);
+previewRuntimeBtn?.addEventListener("click", () => previewRuntimeConfig(false));
+downloadRuntimeBtn?.addEventListener("click", () => previewRuntimeConfig(true));
+
 updateDirectionButtons();
+updateEditorDirectionButtons();
 loadRoutes();

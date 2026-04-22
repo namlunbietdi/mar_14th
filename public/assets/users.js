@@ -1,4 +1,4 @@
-const currentAppUser = window.busApp?.getStoredUser();
+﻿const currentAppUser = window.busApp?.getStoredUser();
 const userTableBody = document.getElementById("userTableBody");
 const userSearchInput = document.getElementById("userSearchInput");
 const searchUserBtn = document.getElementById("searchUserBtn");
@@ -49,18 +49,18 @@ function openModal(mode, user = null) {
   editingUserId.value = user?.id || "";
 
   if (mode === "edit" && user) {
-    userModalTitle.textContent = "Chinh sua nguoi dung";
-    userModalSubtitle.textContent = "Cap nhat thong tin va role cua tai khoan.";
-    userFormHint.textContent = "Bo trong mat khau neu khong muon thay doi.";
+    userModalTitle.textContent = "Chỉnh sửa người dùng";
+    userModalSubtitle.textContent = "Cap nhat thông tin va role cua tài khoản.";
+    userFormHint.textContent = "Bo trong mật khẩu neu không muon thay doi.";
     formUsername.value = user.username;
     formFullName.value = user.fullName;
     formPosition.value = user.position;
     formRole.value = user.role;
     formPassword.required = false;
   } else {
-    userModalTitle.textContent = "Them nguoi dung";
-    userModalSubtitle.textContent = "Nhap day du thong tin de tao tai khoan moi.";
-    userFormHint.textContent = "Mat khau la bat buoc khi them nguoi dung moi.";
+    userModalTitle.textContent = "Them người dùng";
+    userModalSubtitle.textContent = "Nhap day du thông tin de tao tài khoản moi.";
+    userFormHint.textContent = "Mật khẩu la bat buoc khi them người dùng moi.";
     formPassword.required = true;
   }
 
@@ -71,7 +71,7 @@ function renderUsers() {
   if (!users.length) {
     userTableBody.innerHTML = `
       <tr>
-        <td colspan="5">Chua co nguoi dung phu hop.</td>
+        <td colspan="5">Chưa co người dùng phu hop.</td>
       </tr>
     `;
     return;
@@ -89,7 +89,7 @@ function renderUsers() {
             <button class="link-btn danger" type="button" data-action="delete" data-id="${user.id}">Xoa</button>
           </div>
         `
-        : `<span class="muted-text">Khong co quyen</span>`;
+        : `<span class="muted-text">Không co quyen</span>`;
 
       return `
         <tr>
@@ -105,19 +105,19 @@ function renderUsers() {
 }
 
 async function loadUsers(search = "") {
-  setPageMessage("Dang tai danh sach nguoi dung...");
+  setPageMessage("Đang tải danh sach người dùng...");
 
   try {
     const response = await window.busApp.authFetch(`/api/users?search=${encodeURIComponent(search)}`);
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the tai du lieu.");
+      throw new Error(data.message || "Không thể tai du lieu.");
     }
 
     users = data.users;
     renderUsers();
-    setPageMessage(`Da tai ${users.length} nguoi dung.`, "success");
+    setPageMessage(`Đã tải ${users.length} người dùng.`, "success");
 
   } catch (error) {
     userTableBody.innerHTML = `
@@ -130,7 +130,7 @@ async function loadUsers(search = "") {
 }
 
 async function deleteUser(userId) {
-  const confirmed = window.confirm("Ban co chac chan muon xoa nguoi dung nay khong?");
+  const confirmed = window.confirm("Ban co chac chan muon xoa người dùng nay không?");
 
   if (!confirmed) {
     return;
@@ -143,7 +143,7 @@ async function deleteUser(userId) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the xoa nguoi dung.");
+      throw new Error(data.message || "Không thể xoa người dùng.");
     }
 
     setPageMessage(data.message, "success");
@@ -154,7 +154,7 @@ async function deleteUser(userId) {
 }
 
 async function resetPassword(userId) {
-  const confirmed = window.confirm("Ban co muon reset mat khau nguoi dung nay ve mac dinh 123456 khong?");
+  const confirmed = window.confirm("Ban co muon reset mật khẩu người dùng nay ve mac dinh 123456 không?");
 
   if (!confirmed) {
     return;
@@ -167,7 +167,7 @@ async function resetPassword(userId) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the reset mat khau.");
+      throw new Error(data.message || "Không thể reset mật khẩu.");
     }
 
     setPageMessage(data.message, "success");
@@ -246,7 +246,7 @@ userForm.addEventListener("submit", async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the luu nguoi dung.");
+      throw new Error(data.message || "Không thể luu người dùng.");
     }
 
     if (currentAppUser?.id === data.user?.id) {
@@ -262,3 +262,4 @@ userForm.addEventListener("submit", async (event) => {
 });
 
 loadUsers();
+

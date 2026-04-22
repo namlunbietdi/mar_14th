@@ -1,4 +1,4 @@
-const currentDispatchUser = window.busApp?.getStoredUser();
+﻿const currentDispatchUser = window.busApp?.getStoredUser();
 const dispatchTableBody = document.getElementById("dispatchTableBody");
 const dispatchPageMessage = document.getElementById("dispatchPageMessage");
 const dispatchTotalCount = document.getElementById("dispatchTotalCount");
@@ -35,6 +35,7 @@ let dispatchMetadata = {
   employees: [],
   devices: []
 };
+let editingOrderContext = null;
 
 if (currentDispatchUser?.role !== "admin") {
   openDispatchModalBtn.style.display = "none";
@@ -51,6 +52,7 @@ function setDispatchFormMessage(message, type = "") {
 }
 
 function closeDispatchModal() {
+  editingOrderContext = null;
   dispatchModal.classList.add("hidden");
 }
 
@@ -68,7 +70,7 @@ function toDateTimeLocalValue(value) {
 }
 
 function getDispatchStatusLabel(status) {
-  if (status === "running") return "Dang chay";
+  if (status === "running") return "Đang chạy";
   if (status === "completed") return "Hoan thanh";
   if (status === "cancelled") return "Huy";
   return "Ke hoach";
@@ -82,7 +84,7 @@ function renderDispatchStats() {
 
 function renderDispatchTable() {
   if (!dispatchOrders.length) {
-    dispatchTableBody.innerHTML = `<tr><td colspan="8">Chua co lenh dieu phoi nao.</td></tr>`;
+    dispatchTableBody.innerHTML = `<tr><td colspan="8">Chưa co lenh điều phối nao.</td></tr>`;
     renderDispatchStats();
     return;
   }
@@ -95,10 +97,10 @@ function renderDispatchTable() {
         <td>${order.routeNumber} - ${order.routeName}</td>
         <td>${order.licensePlate}</td>
         <td>${order.driverName}</td>
-        <td>${order.deviceId || '<span class="muted-text">Chua gan</span>'}</td>
+        <td>${order.deviceId || '<span class="muted-text">Chưa gan</span>'}</td>
         <td>${formatDateTime(order.plannedStartTime)}<br><span class="muted-text">${formatDateTime(order.plannedEndTime)}</span></td>
         <td><span class="status-badge ${order.status === "running" ? "working" : order.status === "planned" ? "warning" : "left"}">${getDispatchStatusLabel(order.status)}</span></td>
-        <td>${canManage ? `<div class="action-group"><button class="link-btn" type="button" data-action="edit" data-id="${order.id}">Sua</button><button class="link-btn danger" type="button" data-action="delete" data-id="${order.id}">Xoa</button></div>` : '<span class="muted-text">Khong co quyen</span>'}</td>
+        <td>${canManage ? `<div class="action-group"><button class="link-btn" type="button" data-action="edit" data-id="${order.id}">Sua</button><button class="link-btn danger" type="button" data-action="delete" data-id="${order.id}">Xoa</button></div>` : '<span class="muted-text">Không co quyen</span>'}</td>
       </tr>
     `)
     .join("");
@@ -107,9 +109,25 @@ function renderDispatchTable() {
 }
 
 function populateDispatchSelect(selectElement, items, valueKey, labelBuilder, includeEmptyOption = false) {
-  const options = includeEmptyOption ? [`<option value="">Khong chon</option>`] : [];
+  const options = includeEmptyOption ? [`<option value="">Không chon</option>`] : [];
   options.push(...items.map((item) => `<option value="${item[valueKey]}">${labelBuilder(item)}</option>`));
   selectElement.innerHTML = options.join("");
+}
+
+function renderDispatchDeviceSelectOptions(order = null) {
+  const options = [`<option value="">Không chon</option>`];
+  const currentOrderId = order?.id || null;
+  const currentDeviceCode = order?.deviceId || "";
+
+  dispatchMetadata.devices.forEach((device) => {
+    const isCurrentOrderDevice = currentDeviceCode && device.deviceId === currentDeviceCode;
+    const isUnavailable = Boolean(device.isAssigned) && !(isCurrentOrderDevice || device.assignedDispatchOrderId === currentOrderId);
+    const disabledAttr = isUnavailable ? "disabled" : "";
+    const statusLabel = isUnavailable ? " (Dang gan lenh khac)" : "";
+    options.push(`<option value="${device.id}" ${disabledAttr}>${device.deviceId}${statusLabel}</option>`);
+  });
+
+  dispatchDeviceSelect.innerHTML = options.join("");
 }
 
 async function loadDispatchMetadata() {
@@ -117,7 +135,7 @@ async function loadDispatchMetadata() {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Khong the tai metadata dieu phoi.");
+    throw new Error(data.message || "Không thể tai metadata điều phối.");
   }
 
   dispatchMetadata = data;
@@ -125,23 +143,23 @@ async function loadDispatchMetadata() {
   populateDispatchSelect(dispatchVehicleSelect, data.vehicles, "id", (vehicle) => vehicle.licensePlate);
   populateDispatchSelect(dispatchDriverSelect, data.employees, "id", (employee) => employee.fullName);
   populateDispatchSelect(dispatchConductorSelect, data.employees, "id", (employee) => employee.fullName, true);
-  populateDispatchSelect(dispatchDeviceSelect, data.devices, "id", (device) => device.deviceId, true);
+  renderDispatchDeviceSelectOptions(editingOrderContext);
 }
 
 async function loadDispatchOrders() {
-  setDispatchPageMessage("Dang tai lenh dieu phoi...");
+  setDispatchPageMessage("Đang tải lenh điều phối...");
 
   try {
     const response = await window.busApp.authFetch("/api/dispatch-orders");
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the tai lenh dieu phoi.");
+      throw new Error(data.message || "Không thể tai lenh điều phối.");
     }
 
     dispatchOrders = data.orders;
     renderDispatchTable();
-    setDispatchPageMessage(`Da tai ${dispatchOrders.length} lenh dieu phoi.`, "success");
+    setDispatchPageMessage(`Đã tải ${dispatchOrders.length} lenh điều phối.`, "success");
   } catch (error) {
     dispatchTableBody.innerHTML = `<tr><td colspan="8">${error.message}</td></tr>`;
     setDispatchPageMessage(error.message, "error");
@@ -177,11 +195,12 @@ function openDispatchModal(mode, order = null) {
 
   dispatchForm.reset();
   setDispatchFormMessage("");
+  editingOrderContext = mode === "edit" ? order : null;
   editingDispatchId.value = order?.id || "";
-  dispatchModalTitle.textContent = mode === "edit" ? "Chinh sua lenh dieu phoi" : "Them lenh dieu phoi";
+  dispatchModalTitle.textContent = mode === "edit" ? "Chỉnh sửa lenh điều phối" : "Them lenh điều phối";
   dispatchModalSubtitle.textContent = mode === "edit"
-    ? "Cap nhat thong tin lenh, doi thiet bi hoac thay trang thai van hanh."
-    : "Tao lenh van hanh moi va gan thiet bi dinh vi neu can.";
+    ? "Cap nhat thông tin lenh, doi thiết bị hoac thay trang thai van hanh."
+    : "Tao lenh van hanh moi va gan thiết bị định vị neu can.";
 
   if (mode === "edit" && order) {
     dispatchOrderCodeInput.value = order.orderCode;
@@ -190,6 +209,7 @@ function openDispatchModal(mode, order = null) {
     dispatchVehicleSelect.value = order.vehicleId;
     dispatchDriverSelect.value = order.driverId;
     dispatchConductorSelect.value = order.conductorId || "";
+    renderDispatchDeviceSelectOptions(order);
     dispatchDeviceSelect.value = dispatchMetadata.devices.find((device) => device.deviceId === order.deviceId)?.id || "";
     dispatchAssignmentNoteInput.value = order.assignmentNote || "";
     dispatchPlannedStartInput.value = toDateTimeLocalValue(order.plannedStartTime);
@@ -198,6 +218,7 @@ function openDispatchModal(mode, order = null) {
     dispatchActualEndInput.value = toDateTimeLocalValue(order.actualEndTime);
     dispatchNoteInput.value = order.note || "";
   } else {
+    renderDispatchDeviceSelectOptions(null);
     fillNextDispatchCode();
     dispatchStatusSelect.value = "planned";
   }
@@ -206,7 +227,7 @@ function openDispatchModal(mode, order = null) {
 }
 
 async function deleteDispatchOrder(orderId) {
-  const confirmed = window.confirm("Ban co chac chan muon xoa lenh dieu phoi nay khong?");
+  const confirmed = window.confirm("Ban co chac chan muon xoa lenh điều phối nay không?");
 
   if (!confirmed) {
     return;
@@ -219,7 +240,7 @@ async function deleteDispatchOrder(orderId) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the xoa lenh dieu phoi.");
+      throw new Error(data.message || "Không thể xoa lenh điều phối.");
     }
 
     setDispatchPageMessage(data.message, "success");
@@ -268,7 +289,7 @@ dispatchForm?.addEventListener("submit", async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the luu lenh dieu phoi.");
+      throw new Error(data.message || "Không thể luu lenh điều phối.");
     }
 
     setDispatchPageMessage(data.message, "success");
@@ -299,3 +320,4 @@ dispatchTableBody?.addEventListener("click", (event) => {
 });
 
 loadDispatchPage();
+

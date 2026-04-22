@@ -1,4 +1,4 @@
-const User = require("../models/User");
+﻿const User = require("../models/User");
 
 async function attachCurrentUser(req, res, next) {
   const userId = req.header("x-user-id");
@@ -15,7 +15,7 @@ async function attachCurrentUser(req, res, next) {
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: "Thong tin xac thuc khong hop le."
+      message: "Thông tin xác thực không hợp lệ."
     });
   }
 }
@@ -47,3 +47,4 @@ module.exports = {
   requireAuth,
   requireAdmin
 };
+

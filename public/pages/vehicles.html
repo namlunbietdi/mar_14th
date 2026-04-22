@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quan ly phuong tien</title>
+  <title>Quan ly phương tiện</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,28 +18,28 @@
           <img class="header-logo" src="../assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
         </div>
         <div class="header-copy">
-          <p>Do an Tot nghiep</p>
-          <h2>HE THONG QUAN LY XE BUYT THONG MINH</h2>
-          <h3>Ung dung IoT cho dinh vi, giam sat va dieu phoi phuong tien cong cong</h3>
+          <p>Đồ án Tốt nghiệp</p>
+          <h2>HỆ THỐNG QUẢN LÝ XE BUÝT THÔNG MINH</h2>
+          <h3>Ứng dụng IoT cho định vị, giám sát và điều phối phương tiện công cộng</h3>
         </div>
       </div>
     </header>
   </div>
 
   <main class="module-shell">
-    <a class="back-link" href="../dashboard.html">< Quay lai dashboard</a>
+    <a class="back-link" href="../dashboard.html">< Quay lại dashboard</a>
 
     <section class="page-card user-management-card">
       <div class="user-page-header">
         <div>
-          <p class="eyebrow">Module Phuong tien</p>
-          <h1>Quan ly phuong tien</h1>
-          <p>Danh sach phuong tien, danh muc hang xe va loai xe phuc vu quan ly khai thac.</p>
+          <p class="eyebrow">Module Phương tiện</p>
+          <h1>Quan ly phương tiện</h1>
+          <p>Danh sach phương tiện, danh muc hang xe va loai xe phuc vu quan ly khai thac.</p>
         </div>
 
         <div class="toolbar-actions">
-          <button id="openVehicleTypeModalBtn" class="secondary-btn" type="button">Them/Xoa loai phuong tien</button>
-          <button id="openVehicleModalBtn" class="primary-btn" type="button">Them phuong tien</button>
+          <button id="openVehicleTypeModalBtn" class="secondary-btn" type="button">Them/Xoa loai phương tiện</button>
+          <button id="openVehicleModalBtn" class="primary-btn" type="button">Them phương tiện</button>
         </div>
       </div>
 
@@ -54,14 +54,14 @@
               <th>Loai xe</th>
               <th>Suc chua</th>
               <th>Thoi diem van doanh</th>
-              <th>Thoi diem het nien han</th>
+              <th>Thoi diem het niên hạn</th>
               <th>Trang thai</th>
               <th>Thao tac</th>
             </tr>
           </thead>
           <tbody id="vehicleTableBody">
             <tr>
-              <td colspan="8">Dang tai du lieu...</td>
+              <td colspan="8">Đang tải du lieu...</td>
             </tr>
           </tbody>
         </table>
@@ -73,8 +73,8 @@
     <div class="modal-card">
       <div class="modal-header">
         <div>
-          <h2>Loai phuong tien</h2>
-          <p>Them hang xe, loai xe va suc chua de su dung cho danh sach phuong tien.</p>
+          <h2>Loai phương tiện</h2>
+          <p>Them hang xe, loai xe va suc chua de su dung cho danh sach phương tiện.</p>
         </div>
         <button id="closeVehicleTypeModalBtn" class="icon-btn" type="button">X</button>
       </div>
@@ -115,7 +115,7 @@
           </thead>
           <tbody id="vehicleTypeTableBody">
             <tr>
-              <td colspan="4">Chua co loai phuong tien.</td>
+              <td colspan="4">Chưa co loai phương tiện.</td>
             </tr>
           </tbody>
         </table>
@@ -127,8 +127,8 @@
     <div class="modal-card">
       <div class="modal-header">
         <div>
-          <h2 id="vehicleModalTitle">Them phuong tien</h2>
-          <p>Nhap thong tin phuong tien va chon loai xe tu danh muc da tao.</p>
+          <h2 id="vehicleModalTitle">Them phương tiện</h2>
+          <p>Nhap thông tin phương tiện va chon loai xe tu danh muc da tao.</p>
         </div>
         <button id="closeVehicleModalBtn" class="icon-btn" type="button">X</button>
       </div>
@@ -164,9 +164,9 @@
         <label class="field">
           <span>Trang thai</span>
           <select id="vehicleStatusSelect" required>
-            <option value="active">Hoat dong</option>
-            <option value="maintenance">Bao tri</option>
-            <option value="stopped">Dung hoat dong</option>
+            <option value="active">Hoạt động</option>
+            <option value="maintenance">Bảo trì</option>
+            <option value="stopped">Dung hoạt động</option>
           </select>
         </label>
 
@@ -184,3 +184,4 @@
   <script src="../assets/vehicles.js"></script>
 </body>
 </html>
+

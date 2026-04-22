@@ -1,4 +1,4 @@
-const currentStopUser = window.busApp?.getStoredUser();
+﻿const currentStopUser = window.busApp?.getStoredUser();
 const stopTableBody = document.getElementById("stopTableBody");
 const stopPageMessage = document.getElementById("stopPageMessage");
 const openStopModalBtn = document.getElementById("openStopModalBtn");
@@ -66,7 +66,7 @@ async function loadNextStopCode() {
   try {
     const response = await window.busApp.authFetch("/api/stops/next-code");
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || "Khong the tai ma diem dung.");
+    if (!response.ok) throw new Error(data.message || "Không thể tai ma điểm dừng.");
     stopCodeInput.value = data.stopCode;
   } catch (error) {
     stopCodeInput.value = "";
@@ -91,7 +91,7 @@ async function exportStops() {
     const response = await window.busApp.authFetch("/api/stops/export", { headers: {} });
     if (!response.ok) {
       const data = await response.json();
-      throw new Error(data.message || "Khong the export danh sach diem dung.");
+      throw new Error(data.message || "Không thể export danh sach điểm dừng.");
     }
     const csvBlob = await response.blob();
     downloadBlob(csvBlob, "danh-sach-diem-dung.csv", "text/csv;charset=utf-8;");
@@ -102,7 +102,7 @@ async function exportStops() {
 
 function renderRouteCheckboxes(selectedRouteIds = []) {
   if (!routes.length) {
-    stopRouteCheckboxList.innerHTML = `<p class="muted-text">Chua co tuyen nao de gan vao diem dung.</p>`;
+    stopRouteCheckboxList.innerHTML = `<p class="muted-text">Chưa co tuyến nao de gan vao điểm dừng.</p>`;
     return;
   }
 
@@ -112,11 +112,11 @@ function renderRouteCheckboxes(selectedRouteIds = []) {
         <div class="route-direction-title">${route.routeNumber} - ${route.routeName}</div>
         <label class="route-checkbox-item">
           <input type="checkbox" data-route-id="${route.id}" data-direction="outbound" ${selectedRouteIds.some((item) => item.routeId === route.id && item.outbound) ? "checked" : ""}>
-          <span>Luot di</span>
+          <span>Lượt đi</span>
         </label>
         <label class="route-checkbox-item">
           <input type="checkbox" data-route-id="${route.id}" data-direction="inbound" ${selectedRouteIds.some((item) => item.routeId === route.id && item.inbound) ? "checked" : ""}>
-          <span>Luot ve</span>
+          <span>Lượt về</span>
         </label>
       </div>
     `)
@@ -205,8 +205,8 @@ function renderStopMap() {
   clearStopMarkers();
 
   if (!stops.length) {
-    selectedStopTitle.textContent = "Tat ca diem dung";
-    selectedStopText.textContent = "Ban do mac dinh se hien thi toan bo diem dung trong he thong.";
+    selectedStopTitle.textContent = "Tat ca điểm dừng";
+    selectedStopText.textContent = "Ban do mac dinh se hien thi toan bo điểm dừng trong he thong.";
     return;
   }
 
@@ -228,15 +228,15 @@ function renderStopMap() {
     stopMap.setView([selectedStop.latitude, selectedStop.longitude], 16);
     stopMarkers[0]?.openPopup();
   } else {
-    selectedStopTitle.textContent = "Tat ca diem dung";
-    selectedStopText.textContent = "Ban do mac dinh se hien thi toan bo diem dung trong he thong.";
+    selectedStopTitle.textContent = "Tat ca điểm dừng";
+    selectedStopText.textContent = "Ban do mac dinh se hien thi toan bo điểm dừng trong he thong.";
     stopMap.fitBounds(bounds, { padding: [24, 24] });
   }
 }
 
 function renderStops() {
   if (!stops.length) {
-    stopTableBody.innerHTML = `<tr><td colspan="5">Chua co diem dung nao.</td></tr>`;
+    stopTableBody.innerHTML = `<tr><td colspan="5">Chưa co điểm dừng nao.</td></tr>`;
     renderStopMap();
     return;
   }
@@ -248,8 +248,8 @@ function renderStops() {
         <td>${stop.stopCode}</td>
         <td>${stop.stopName}</td>
         <td>${stop.routeNumbers.join(", ") || "-"}</td>
-        <td>${stop.isEndpoint ? "Co" : "Khong"}</td>
-        <td>${canManage ? `<div class="action-group"><button class="link-btn" type="button" data-action="edit-stop" data-id="${stop.id}">Sua</button><button class="link-btn danger" type="button" data-action="delete-stop" data-id="${stop.id}">Xoa</button></div>` : '<span class="muted-text">Khong co quyen</span>'}</td>
+        <td>${stop.isEndpoint ? "Co" : "Không"}</td>
+        <td>${canManage ? `<div class="action-group"><button class="link-btn" type="button" data-action="edit-stop" data-id="${stop.id}">Sua</button><button class="link-btn danger" type="button" data-action="delete-stop" data-id="${stop.id}">Xoa</button></div>` : '<span class="muted-text">Không co quyen</span>'}</td>
       </tr>
     `)
     .join("");
@@ -258,7 +258,7 @@ function renderStops() {
 }
 
 async function loadStops() {
-  setStopPageMessage("Dang tai danh sach diem dung...");
+  setStopPageMessage("Đang tải danh sach điểm dừng...");
 
   try {
     const [stopsResponse, routesResponse] = await Promise.all([
@@ -268,14 +268,14 @@ async function loadStops() {
     const stopsData = await stopsResponse.json();
     const routesData = await routesResponse.json();
 
-    if (!stopsResponse.ok) throw new Error(stopsData.message || "Khong the tai danh sach diem dung.");
-    if (!routesResponse.ok) throw new Error(routesData.message || "Khong the tai danh sach tuyen.");
+    if (!stopsResponse.ok) throw new Error(stopsData.message || "Không thể tai danh sach điểm dừng.");
+    if (!routesResponse.ok) throw new Error(routesData.message || "Không thể tai danh sach tuyến.");
 
     stops = stopsData.stops;
     routes = routesData.routes;
 
     renderStops();
-    setStopPageMessage(`Da tai ${stops.length} diem dung.`, "success");
+    setStopPageMessage(`Đã tải ${stops.length} điểm dừng.`, "success");
   } catch (error) {
     stopTableBody.innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
     setStopPageMessage(error.message, "error");
@@ -287,7 +287,7 @@ async function openStopModal(mode, stop = null) {
   stopForm.reset();
   setStopFormMessage("");
   editingStopId.value = stop?.id || "";
-  stopModalTitle.textContent = mode === "edit" ? "Chinh sua diem dung" : "Them diem dung";
+  stopModalTitle.textContent = mode === "edit" ? "Chỉnh sửa điểm dừng" : "Them điểm dừng";
 
   if (mode === "edit" && stop) {
     stopCodeInput.value = stop.stopCode;
@@ -340,11 +340,11 @@ stopTableBody?.addEventListener("click", async (event) => {
   }
 
   if (action === "delete-stop") {
-    if (!window.confirm("Ban co chac chan muon xoa diem dung nay khong?")) return;
+    if (!window.confirm("Ban co chac chan muon xoa điểm dừng nay không?")) return;
     try {
       const response = await window.busApp.authFetch(`/api/stops/${stopId}`, { method: "DELETE" });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Khong the xoa diem dung.");
+      if (!response.ok) throw new Error(data.message || "Không thể xoa điểm dừng.");
       if (selectedStopId === stopId) selectedStopId = "";
       setStopPageMessage(data.message, "success");
       await loadStops();
@@ -373,7 +373,7 @@ stopForm?.addEventListener("submit", async (event) => {
       body: JSON.stringify(payload)
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || "Khong the luu diem dung.");
+    if (!response.ok) throw new Error(data.message || "Không thể luu điểm dừng.");
 
     selectedStopId = data.stop.id;
     setStopPageMessage(data.message, "success");
@@ -385,3 +385,4 @@ stopForm?.addEventListener("submit", async (event) => {
 });
 
 loadStops();
+

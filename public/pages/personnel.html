@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
@@ -18,35 +18,35 @@
           <img class="header-logo" src="../assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
         </div>
         <div class="header-copy">
-          <p>Do an Tot nghiep</p>
-          <h2>HE THONG QUAN LY XE BUYT THONG MINH</h2>
-          <h3>Ung dung IoT cho dinh vi, giam sat va dieu phoi phuong tien cong cong</h3>
+          <p>Đồ án Tốt nghiệp</p>
+          <h2>HỆ THỐNG QUẢN LÝ XE BUÝT THÔNG MINH</h2>
+          <h3>Ứng dụng IoT cho định vị, giám sát và điều phối phương tiện công cộng</h3>
         </div>
       </div>
     </header>
   </div>
 
   <main class="module-shell">
-    <a class="back-link" href="../dashboard.html">< Quay lai dashboard</a>
+    <a class="back-link" href="../dashboard.html">< Quay lại dashboard</a>
 
     <section class="page-card user-management-card">
       <div class="user-page-header">
         <div>
           <p class="eyebrow">Module Nhan su</p>
           <h1>Quan ly nhan su</h1>
-          <p>Danh sach tai xe va nhan vien phuc vu trong he thong van hanh xe buyt.</p>
+          <p>Danh sach tai xe va nhân viên phuc vu trong he thong van hanh xe buýt.</p>
         </div>
 
         <div class="toolbar-actions">
           <button id="downloadTemplateBtn" class="secondary-btn" type="button">Xuat mau file CSV</button>
           <button id="importEmployeesBtn" class="secondary-btn" type="button">Import</button>
           <button id="exportEmployeesBtn" class="secondary-btn" type="button">Export</button>
-          <button id="openEmployeeModalBtn" class="primary-btn" type="button">Them nhan vien</button>
+          <button id="openEmployeeModalBtn" class="primary-btn" type="button">Them nhân viên</button>
         </div>
       </div>
 
       <div class="user-toolbar">
-        <input id="employeeSearchInput" class="search-input" type="search" placeholder="Tim theo ma nhan vien, ho ten, chuc vu">
+        <input id="employeeSearchInput" class="search-input" type="search" placeholder="Tim theo ma nhân viên, ho ten, chuc vu">
         <button id="searchEmployeeBtn" class="secondary-btn" type="button">Tim kiem</button>
       </div>
 
@@ -58,8 +58,8 @@
             <tr>
               <th>
                 <button id="employeeCodeSortBtn" class="table-sort-btn" type="button">
-                  Ma nhan vien
-                  <span id="employeeCodeSortIcon">↑</span>
+                  Ma nhân viên
+                  <span id="employeeCodeSortIcon">â†‘</span>
                 </button>
               </th>
               <th>Ho va ten</th>
@@ -71,7 +71,7 @@
           </thead>
           <tbody id="employeeTableBody">
             <tr>
-              <td colspan="6">Dang tai du lieu...</td>
+              <td colspan="6">Đang tải du lieu...</td>
             </tr>
           </tbody>
         </table>
@@ -85,8 +85,8 @@
     <div class="modal-card">
       <div class="modal-header">
         <div>
-          <h2 id="employeeModalTitle">Them nhan vien</h2>
-          <p id="employeeModalSubtitle">Nhap thong tin nhan su de them vao he thong.</p>
+          <h2 id="employeeModalTitle">Them nhân viên</h2>
+          <p id="employeeModalSubtitle">Nhap thông tin nhan su de them vao he thong.</p>
         </div>
         <button id="closeEmployeeModalBtn" class="icon-btn" type="button">X</button>
       </div>
@@ -95,7 +95,7 @@
         <input id="editingEmployeeId" type="hidden">
 
         <label class="field">
-          <span>Ma nhan vien</span>
+          <span>Ma nhân viên</span>
           <input id="formEmployeeCode" type="text" readonly>
         </label>
 
@@ -117,7 +117,7 @@
         <label class="field">
           <span>Trang thai</span>
           <select id="formEmployeeStatus" required>
-            <option value="working">Dang lam viec</option>
+            <option value="working">Đang làm việc</option>
             <option value="left">Da nghi</option>
           </select>
         </label>
@@ -136,3 +136,4 @@
   <script src="../assets/personnel.js"></script>
 </body>
 </html>
+

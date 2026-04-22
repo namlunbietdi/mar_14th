@@ -1,4 +1,4 @@
-const Device = require("../models/Device");
+﻿const Device = require("../models/Device");
 const DeviceAssignment = require("../models/DeviceAssignment");
 const DeviceLastState = require("../models/DeviceLastState");
 const LocationLog = require("../models/LocationLog");
@@ -51,7 +51,7 @@ function normalizeTelemetryPayload(payload, topic = "") {
   const parsedGpsTime = new Date(gpsTime);
 
   if (Number.isNaN(parsedGpsTime.getTime())) {
-    throw new Error("gpsTime khong hop le.");
+    throw new Error("gpsTime không hợp lệ.");
   }
 
   return {
@@ -71,7 +71,7 @@ async function ingestTelemetryPayload(payload, topic = "") {
   const device = await Device.findOne({ deviceId: telemetry.deviceCode });
 
   if (!device) {
-    throw new Error(`Khong tim thay thiet bi ${telemetry.deviceCode} trong he thong.`);
+    throw new Error(`Không tìm thấy thiết bị ${telemetry.deviceCode} trong he thong.`);
   }
 
   const activeAssignment = await DeviceAssignment.findOne({
@@ -131,3 +131,4 @@ module.exports = {
   ingestTelemetryPayload,
   normalizeTelemetryPayload
 };
+

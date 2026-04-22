@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
@@ -91,6 +91,50 @@
               <span><i class="legend-dot inbound"></i> Luot ve</span>
             </div>
           </div>
+        </div>
+
+        <div class="route-direction-editor">
+          <div class="route-direction-header">
+            <h3>Cau hinh diem dung theo huong</h3>
+            <div class="direction-tab-row">
+              <button id="editorOutboundBtn" class="map-chip active" type="button">Luot di</button>
+              <button id="editorInboundBtn" class="map-chip" type="button">Luot ve</button>
+            </div>
+          </div>
+
+          <p id="directionEditorMessage" class="inline-message" aria-live="polite"></p>
+
+          <div class="direction-add-row">
+            <select id="directionStopSelect"></select>
+            <button id="addDirectionStopBtn" class="secondary-btn" type="button">Them diem dung</button>
+            <button id="saveDirectionBtn" class="primary-btn" type="button">Luu thu tu</button>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table direction-order-table">
+              <thead>
+                <tr>
+                  <th>Thu tu</th>
+                  <th>Ma diem</th>
+                  <th>Ten diem dung</th>
+                  <th>Audio ID</th>
+                  <th>Dau/cuoi</th>
+                  <th>Keo tha</th>
+                  <th>Xoa</th>
+                </tr>
+              </thead>
+              <tbody id="directionOrderBody">
+                <tr><td colspan="7">Chon mot tuyen de quan ly thu tu diem dung.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="direction-runtime-row">
+            <button id="previewRuntimeBtn" class="secondary-btn" type="button">Xem runtime JSON</button>
+            <button id="downloadRuntimeBtn" class="secondary-btn" type="button">Tai runtime JSON</button>
+          </div>
+
+          <pre id="runtimePreview" class="runtime-preview hidden"></pre>
         </div>
       </div>
     </section>

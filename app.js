@@ -11,6 +11,7 @@ const dispatchOrderRoutes = require("./routes/dispatch-orders");
 const monitoringRoutes = require("./routes/monitoring");
 const routeRoutes = require("./routes/routes");
 const stopRoutes = require("./routes/stops");
+const routeDirectionRoutes = require("./routes/route-directions");
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use("/api/dispatch-orders", dispatchOrderRoutes);
 app.use("/api/monitoring", monitoringRoutes);
 app.use("/api/routes", routeRoutes);
 app.use("/api/stops", stopRoutes);
+app.use("/api/route-directions", routeDirectionRoutes);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));

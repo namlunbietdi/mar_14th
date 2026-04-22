@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const Employee = require("../models/Employee");
 const { requireAdmin, requireAuth } = require("../middleware/auth");
 const { getNextEmployeeCode, peekNextEmployeeCode } = require("../utils/codes");
@@ -29,7 +29,7 @@ router.get("/", requireAuth, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the lay danh sach nhan su."
+      message: "Không thể lay danh sach nhan su."
     });
   }
 });
@@ -45,7 +45,7 @@ router.get("/next-code", requireAdmin, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the tao ma nhan vien."
+      message: "Không thể tao ma nhân viên."
     });
   }
 });
@@ -53,13 +53,13 @@ router.get("/next-code", requireAdmin, async (req, res) => {
 router.get("/export", requireAuth, async (req, res) => {
   try {
     const employees = await Employee.find().sort({ createdAt: -1 });
-    const header = ["Ma nhan vien", "Ho va ten", "Ngay sinh", "Chuc vu", "Trang thai"];
+    const header = ["Ma nhân viên", "Ho va ten", "Ngay sinh", "Chuc vu", "Trang thai"];
     const rows = employees.map((employee) => [
       employee.employeeCode,
       employee.fullName,
       new Date(employee.birthDate).toISOString().slice(0, 10),
       employee.position,
-      employee.status === "working" ? "Dang lam viec" : "Da nghi"
+      employee.status === "working" ? "Đang làm việc" : "Da nghi"
     ]);
 
     const csvContent = [header, ...rows]
@@ -72,7 +72,7 @@ router.get("/export", requireAuth, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the export danh sach nhan su."
+      message: "Không thể export danh sach nhan su."
     });
   }
 });
@@ -80,8 +80,8 @@ router.get("/export", requireAuth, async (req, res) => {
 router.get("/export-template", requireAdmin, async (req, res) => {
   const header = ["Ho va ten", "Ngay sinh", "Chuc vu", "Trang thai"];
   const sampleRows = [
-    ["Nguyen Van A", "1990-01-15", "Tai xe", "Dang lam viec"],
-    ["Tran Thi B", "1995-06-20", "Nhan vien phuc vu", "Da nghi"]
+    ["Nguyen Van A", "1990-01-15", "Tai xe", "Đang làm việc"],
+    ["Tran Thi B", "1995-06-20", "Nhân viên phuc vu", "Da nghi"]
   ];
 
   const csvContent = [header, ...sampleRows]
@@ -100,7 +100,7 @@ router.post("/", requireAdmin, async (req, res) => {
     if (!fullName || !birthDate || !position || !status) {
       return res.status(400).json({
         success: false,
-        message: "Vui long nhap day du thong tin nhan vien."
+        message: "Vui lòng nhap day du thông tin nhân viên."
       });
     }
 
@@ -116,13 +116,13 @@ router.post("/", requireAdmin, async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Da them nhan vien moi.",
+      message: "Đã thêm nhân viên moi.",
       employee: mapEmployee(employee)
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the them nhan vien."
+      message: "Không thể them nhân viên."
     });
   }
 });
@@ -134,7 +134,7 @@ router.put("/:id", requireAdmin, async (req, res) => {
     if (!fullName || !birthDate || !position || !status) {
       return res.status(400).json({
         success: false,
-        message: "Vui long nhap day du thong tin nhan vien."
+        message: "Vui lòng nhap day du thông tin nhân viên."
       });
     }
 
@@ -155,19 +155,19 @@ router.put("/:id", requireAdmin, async (req, res) => {
     if (!employee) {
       return res.status(404).json({
         success: false,
-        message: "Khong tim thay nhan vien."
+        message: "Không tìm thấy nhân viên."
       });
     }
 
     return res.json({
       success: true,
-      message: "Da cap nhat nhan vien.",
+      message: "Đã cập nhật nhân viên.",
       employee: mapEmployee(employee)
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the cap nhat nhan vien."
+      message: "Không thể cap nhat nhân viên."
     });
   }
 });
@@ -179,18 +179,18 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     if (!employee) {
       return res.status(404).json({
         success: false,
-        message: "Khong tim thay nhan vien."
+        message: "Không tìm thấy nhân viên."
       });
     }
 
     return res.json({
       success: true,
-      message: "Da xoa nhan vien."
+      message: "Đã xóa nhân viên."
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the xoa nhan vien."
+      message: "Không thể xoa nhân viên."
     });
   }
 });
@@ -202,7 +202,7 @@ router.post("/import", requireAdmin, async (req, res) => {
     if (!csvContent || !String(csvContent).trim()) {
       return res.status(400).json({
         success: false,
-        message: "File CSV rong hoac khong hop le."
+        message: "File CSV rong hoac không hợp lệ."
       });
     }
 
@@ -226,7 +226,7 @@ router.post("/import", requireAdmin, async (req, res) => {
       if (!fullName || !birthDate || !position || !status) {
         return res.status(400).json({
           success: false,
-          message: "Noi dung CSV khong hop le. Can dung 4 cot: Ho va ten, Ngay sinh, Chuc vu, Trang thai."
+          message: "Noi dung CSV không hợp lệ. Can dung 4 cot: Ho va ten, Ngay sinh, Chuc vu, Trang thai."
         });
       }
 
@@ -244,14 +244,15 @@ router.post("/import", requireAdmin, async (req, res) => {
 
     return res.json({
       success: true,
-      message: `Da import ${employeesToInsert.length} nhan vien vao he thong.`
+      message: `Da import ${employeesToInsert.length} nhân viên vao he thong.`
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the import file CSV."
+      message: "Không thể import file CSV."
     });
   }
 });
 
 module.exports = router;
+

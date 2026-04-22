@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quan ly diem dung</title>
+  <title>Quan ly điểm dừng</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,29 +19,29 @@
           <img class="header-logo" src="../assets/images/feee_logo.png" alt="Logo Khoa Dien - Dien tu">
         </div>
         <div class="header-copy">
-          <p>Do an Tot nghiep</p>
-          <h2>HE THONG QUAN LY XE BUYT THONG MINH</h2>
-          <h3>Ung dung IoT cho dinh vi, giam sat va dieu phoi phuong tien cong cong</h3>
+          <p>Đồ án Tốt nghiệp</p>
+          <h2>HỆ THỐNG QUẢN LÝ XE BUÝT THÔNG MINH</h2>
+          <h3>Ứng dụng IoT cho định vị, giám sát và điều phối phương tiện công cộng</h3>
         </div>
       </div>
     </header>
   </div>
 
   <main class="module-shell">
-    <a class="back-link" href="../dashboard.html">< Quay lai dashboard</a>
+    <a class="back-link" href="../dashboard.html">< Quay lại dashboard</a>
 
     <section class="route-layout stop-layout">
       <div class="page-card route-list-card">
         <div class="user-page-header">
           <div>
-            <p class="eyebrow">Danh sach diem dung</p>
-            <h1>Quan ly diem dung</h1>
-            <p>Chon mot diem dung de focus ban do, hoac xem tong quan tat ca diem dung hien co.</p>
+            <p class="eyebrow">Danh sach điểm dừng</p>
+            <h1>Quan ly điểm dừng</h1>
+            <p>Chon mot điểm dừng de focus ban do, hoac xem tong quan tat ca điểm dừng hien co.</p>
           </div>
 
           <div class="toolbar-actions">
             <button id="exportStopsBtn" class="secondary-btn" type="button">Export danh sach</button>
-            <button id="openStopModalBtn" class="primary-btn" type="button">Them diem dung</button>
+            <button id="openStopModalBtn" class="primary-btn" type="button">Them điểm dừng</button>
           </div>
         </div>
 
@@ -51,16 +51,16 @@
           <table class="data-table stop-data-table">
             <thead>
               <tr>
-                <th>Ma diem dung</th>
-                <th>Ten diem dung</th>
-                <th>Cac tuyen di qua</th>
+                <th>Ma điểm dừng</th>
+                <th>Ten điểm dừng</th>
+                <th>Cac tuyến di qua</th>
                 <th>La diem dau/cuoi?</th>
                 <th>Thao tac</th>
               </tr>
             </thead>
             <tbody id="stopTableBody">
               <tr>
-                <td colspan="5">Dang tai du lieu...</td>
+                <td colspan="5">Đang tải du lieu...</td>
               </tr>
             </tbody>
           </table>
@@ -70,9 +70,9 @@
       <div class="page-card route-map-card">
         <div class="user-page-header">
           <div>
-            <p class="eyebrow">Ban do diem dung</p>
-            <h2 id="selectedStopTitle">Tat ca diem dung</h2>
-            <p id="selectedStopText">Ban do mac dinh se hien thi toan bo diem dung trong he thong.</p>
+            <p class="eyebrow">Ban do điểm dừng</p>
+            <h2 id="selectedStopTitle">Tat ca điểm dừng</h2>
+            <p id="selectedStopText">Ban do mac dinh se hien thi toan bo điểm dừng trong he thong.</p>
           </div>
         </div>
 
@@ -87,8 +87,8 @@
     <div class="modal-card">
       <div class="modal-header">
         <div>
-          <h2 id="stopModalTitle">Them diem dung</h2>
-          <p>Nhap thong tin diem dung va chon cac tuyen xe buyt di qua vi tri nay.</p>
+          <h2 id="stopModalTitle">Them điểm dừng</h2>
+          <p>Nhap thông tin điểm dừng va chon cac tuyến xe buýt di qua vi tri nay.</p>
         </div>
         <button id="closeStopModalBtn" class="icon-btn" type="button">X</button>
       </div>
@@ -97,12 +97,12 @@
         <input id="editingStopId" type="hidden">
 
         <label class="field">
-          <span>Ma diem dung</span>
+          <span>Ma điểm dừng</span>
           <input id="stopCodeInput" type="text" readonly>
         </label>
 
         <label class="field">
-          <span>Ten diem dung</span>
+          <span>Ten điểm dừng</span>
           <input id="stopNameInput" type="text" required>
         </label>
 
@@ -119,13 +119,13 @@
         <label class="field">
           <span>La diem dau/cuoi?</span>
           <select id="stopIsEndpointSelect" required>
-            <option value="false">Khong</option>
+            <option value="false">Không</option>
             <option value="true">Co</option>
           </select>
         </label>
 
         <div class="field">
-          <span>Cac tuyen di qua</span>
+          <span>Cac tuyến di qua</span>
           <div id="stopRouteCheckboxList" class="route-checkbox-grid"></div>
         </div>
 
@@ -144,3 +144,4 @@
   <script src="../assets/stops.js"></script>
 </body>
 </html>
+

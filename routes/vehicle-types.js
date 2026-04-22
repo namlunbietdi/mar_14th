@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const VehicleType = require("../models/VehicleType");
 const Vehicle = require("../models/Vehicle");
 const { requireAdmin, requireAuth } = require("../middleware/auth");
@@ -17,7 +17,7 @@ router.get("/", requireAuth, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the lay danh sach loai phuong tien."
+      message: "Không thể lay danh sach loai phương tiện."
     });
   }
 });
@@ -29,7 +29,7 @@ router.post("/", requireAdmin, async (req, res) => {
     if (!brand || !modelName || !capacity) {
       return res.status(400).json({
         success: false,
-        message: "Vui long nhap day du thong tin loai phuong tien."
+        message: "Vui lòng nhap day du thông tin loai phương tiện."
       });
     }
 
@@ -41,13 +41,13 @@ router.post("/", requireAdmin, async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Da them loai phuong tien.",
+      message: "Đã thêm loai phương tiện.",
       vehicleType: mapVehicleType(vehicleType)
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the them loai phuong tien."
+      message: "Không thể them loai phương tiện."
     });
   }
 });
@@ -59,7 +59,7 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     if (linkedVehicle) {
       return res.status(400).json({
         success: false,
-        message: "Khong the xoa loai phuong tien da duoc gan cho phuong tien."
+        message: "Không thể xoa loai phương tiện da duoc gan cho phương tiện."
       });
     }
 
@@ -68,20 +68,21 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     if (!vehicleType) {
       return res.status(404).json({
         success: false,
-        message: "Khong tim thay loai phuong tien."
+        message: "Không tìm thấy loai phương tiện."
       });
     }
 
     return res.json({
       success: true,
-      message: "Da xoa loai phuong tien."
+      message: "Đã xóa loai phương tiện."
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the xoa loai phuong tien."
+      message: "Không thể xoa loai phương tiện."
     });
   }
 });
 
 module.exports = router;
+

@@ -1,4 +1,4 @@
-const currentPersonnelUser = window.busApp?.getStoredUser();
+﻿const currentPersonnelUser = window.busApp?.getStoredUser();
 const employeeTableBody = document.getElementById("employeeTableBody");
 const employeePageMessage = document.getElementById("employeePageMessage");
 const employeeSearchInput = document.getElementById("employeeSearchInput");
@@ -53,7 +53,7 @@ async function downloadCsvFromApi(url, filename) {
 
     if (!response.ok) {
       const data = await response.json();
-      throw new Error(data.message || "Khong the tai file CSV.");
+      throw new Error(data.message || "Không thể tai file CSV.");
     }
 
     const csvBlob = await response.blob();
@@ -83,7 +83,7 @@ async function loadNextEmployeeCode() {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the tai ma nhan vien.");
+      throw new Error(data.message || "Không thể tai ma nhân viên.");
     }
 
     formEmployeeCode.value = data.employeeCode;
@@ -103,16 +103,16 @@ async function openEmployeeModal(mode, employee = null) {
   editingEmployeeId.value = employee?.id || "";
 
   if (mode === "edit" && employee) {
-    employeeModalTitle.textContent = "Chinh sua nhan vien";
-    employeeModalSubtitle.textContent = "Cap nhat thong tin nhan su trong he thong.";
+    employeeModalTitle.textContent = "Chỉnh sửa nhân viên";
+    employeeModalSubtitle.textContent = "Cap nhat thông tin nhan su trong he thong.";
     formEmployeeCode.value = employee.employeeCode;
     formEmployeeName.value = employee.fullName;
     formEmployeeBirthDate.value = employee.birthDate.slice(0, 10);
     formEmployeePosition.value = employee.position;
     formEmployeeStatus.value = employee.status;
   } else {
-    employeeModalTitle.textContent = "Them nhan vien";
-    employeeModalSubtitle.textContent = "Nhap thong tin nhan su de them vao he thong.";
+    employeeModalTitle.textContent = "Them nhân viên";
+    employeeModalSubtitle.textContent = "Nhap thông tin nhan su de them vao he thong.";
     await loadNextEmployeeCode();
   }
 
@@ -120,7 +120,7 @@ async function openEmployeeModal(mode, employee = null) {
 }
 
 function getStatusLabel(status) {
-  return status === "working" ? "Dang lam viec" : "Da nghi";
+  return status === "working" ? "Đang làm việc" : "Da nghi";
 }
 
 function formatDate(dateValue) {
@@ -138,14 +138,14 @@ function sortEmployeesByCode(items) {
 }
 
 function updateSortButton() {
-  employeeCodeSortIcon.textContent = employeeCodeSortDirection === "asc" ? "↑" : "↓";
+  employeeCodeSortIcon.textContent = employeeCodeSortDirection === "asc" ? "â†‘" : "â†“";
 }
 
 function renderEmployees() {
   if (!employees.length) {
     employeeTableBody.innerHTML = `
       <tr>
-        <td colspan="6">Chua co nhan vien nao.</td>
+        <td colspan="6">Chưa co nhân viên nao.</td>
       </tr>
     `;
     return;
@@ -163,7 +163,7 @@ function renderEmployees() {
             <button class="link-btn danger" type="button" data-action="delete" data-id="${employee.id}">Xoa</button>
           </div>
         `
-        : `<span class="muted-text">Khong co quyen</span>`;
+        : `<span class="muted-text">Không co quyen</span>`;
 
       return `
         <tr>
@@ -180,19 +180,19 @@ function renderEmployees() {
 }
 
 async function loadEmployees(search = "") {
-  setEmployeePageMessage("Dang tai danh sach nhan su...");
+  setEmployeePageMessage("Đang tải danh sach nhan su...");
 
   try {
     const response = await window.busApp.authFetch(`/api/employees?search=${encodeURIComponent(search)}`);
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the tai du lieu.");
+      throw new Error(data.message || "Không thể tai du lieu.");
     }
 
     employees = data.employees;
     renderEmployees();
-    setEmployeePageMessage(`Da tai ${employees.length} nhan vien.`, "success");
+    setEmployeePageMessage(`Đã tải ${employees.length} nhân viên.`, "success");
   } catch (error) {
     employeeTableBody.innerHTML = `
       <tr>
@@ -204,7 +204,7 @@ async function loadEmployees(search = "") {
 }
 
 async function deleteEmployee(employeeId) {
-  const confirmed = window.confirm("Ban co chac chan muon xoa nhan vien nay khong?");
+  const confirmed = window.confirm("Ban co chac chan muon xoa nhân viên nay không?");
 
   if (!confirmed) {
     return;
@@ -217,7 +217,7 @@ async function deleteEmployee(employeeId) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the xoa nhan vien.");
+      throw new Error(data.message || "Không thể xoa nhân viên.");
     }
 
     setEmployeePageMessage(data.message, "success");
@@ -290,7 +290,7 @@ employeeImportInput.addEventListener("change", async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the import file CSV.");
+      throw new Error(data.message || "Không thể import file CSV.");
     }
 
     setEmployeePageMessage(data.message, "success");
@@ -338,7 +338,7 @@ employeeForm.addEventListener("submit", async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the luu nhan vien.");
+      throw new Error(data.message || "Không thể luu nhân viên.");
     }
 
     setEmployeePageMessage(data.message, "success");
@@ -351,3 +351,4 @@ employeeForm.addEventListener("submit", async (event) => {
 
 loadEmployees();
 updateSortButton();
+

@@ -1,4 +1,4 @@
-const monitoringPageMessage = document.getElementById("monitoringPageMessage");
+﻿const monitoringPageMessage = document.getElementById("monitoringPageMessage");
 const monitoringTotalCount = document.getElementById("monitoringTotalCount");
 const monitoringOnlineCount = document.getElementById("monitoringOnlineCount");
 const monitoringOfflineCount = document.getElementById("monitoringOfflineCount");
@@ -80,8 +80,8 @@ function renderMonitoringMap() {
     : monitoringSnapshots;
 
   if (!visibleSnapshots.length) {
-    selectedMonitoringTitle.textContent = "Tat ca phuong tien";
-    selectedMonitoringText.textContent = "Ban do dang hien thi tat ca phuong tien co tin hieu GPS gan nhat.";
+    selectedMonitoringTitle.textContent = "Tat ca phương tiện";
+    selectedMonitoringText.textContent = "Ban do dang hien thi tat ca phương tiện co tin hieu GPS gan nhat.";
     return;
   }
 
@@ -102,8 +102,8 @@ function renderMonitoringMap() {
 
     marker.bindPopup(`
       <strong>${item.licensePlate || item.deviceId}</strong><br>
-      Thiet bi: ${item.deviceId}<br>
-      Tuyen: ${item.routeNumber ? `${item.routeNumber} - ${item.routeName}` : "Chua co lenh"}<br>
+      Thiết bị: ${item.deviceId}<br>
+      Tuyến: ${item.routeNumber ? `${item.routeNumber} - ${item.routeName}` : "Chưa co lenh"}<br>
       Toc do: ${item.speed || 0} km/h<br>
       Lan nhan cuoi: ${formatDateTime(item.lastReceivedAt)}
     `);
@@ -120,10 +120,10 @@ function renderMonitoringMap() {
   const selectedRoute = selectedSnapshot ? getRouteById(selectedSnapshot.routeId) : null;
 
   if (selectedSnapshot) {
-    selectedMonitoringTitle.textContent = `${selectedSnapshot.licensePlate || "Chua gan xe"} | ${selectedSnapshot.deviceId}`;
+    selectedMonitoringTitle.textContent = `${selectedSnapshot.licensePlate || "Chưa gan xe"} | ${selectedSnapshot.deviceId}`;
     selectedMonitoringText.textContent = selectedSnapshot.routeNumber
-      ? `Tuyen ${selectedSnapshot.routeNumber} - ${selectedSnapshot.routeName} | Toc do ${selectedSnapshot.speed || 0} km/h | Cap nhat ${formatDateTime(selectedSnapshot.lastReceivedAt)}`
-      : `Chua gan lenh/tuyen | Toc do ${selectedSnapshot.speed || 0} km/h | Cap nhat ${formatDateTime(selectedSnapshot.lastReceivedAt)}`;
+      ? `Tuyến ${selectedSnapshot.routeNumber} - ${selectedSnapshot.routeName} | Toc do ${selectedSnapshot.speed || 0} km/h | Cap nhat ${formatDateTime(selectedSnapshot.lastReceivedAt)}`
+      : `Chưa gan lenh/tuyến | Toc do ${selectedSnapshot.speed || 0} km/h | Cap nhat ${formatDateTime(selectedSnapshot.lastReceivedAt)}`;
 
     if (selectedRoute?.outboundGeoJson) {
       const outboundLayer = L.geoJSON(selectedRoute.outboundGeoJson, {
@@ -141,8 +141,8 @@ function renderMonitoringMap() {
       layersForBounds.push(inboundLayer);
     }
   } else {
-    selectedMonitoringTitle.textContent = "Tat ca phuong tien";
-    selectedMonitoringText.textContent = "Ban do dang hien thi tat ca phuong tien co tin hieu GPS gan nhat.";
+    selectedMonitoringTitle.textContent = "Tat ca phương tiện";
+    selectedMonitoringText.textContent = "Ban do dang hien thi tat ca phương tiện co tin hieu GPS gan nhat.";
   }
 
   const bounds = buildBoundsFromLayers(layersForBounds);
@@ -153,7 +153,7 @@ function renderMonitoringMap() {
 
 function renderMonitoringTable() {
   if (!monitoringSnapshots.length) {
-    monitoringTableBody.innerHTML = `<tr><td colspan="6">Chua co phuong tien nao dang gui GPS.</td></tr>`;
+    monitoringTableBody.innerHTML = `<tr><td colspan="6">Chưa co phương tiện nao dang gui GPS.</td></tr>`;
     renderMonitoringMap();
     return;
   }
@@ -161,9 +161,9 @@ function renderMonitoringTable() {
   monitoringTableBody.innerHTML = monitoringSnapshots
     .map((item) => `
       <tr class="${item.id === selectedMonitoringId ? "selected-row" : ""}" data-monitoring-id="${item.id}">
-        <td>${item.licensePlate || '<span class="muted-text">Chua gan xe</span>'}</td>
+        <td>${item.licensePlate || '<span class="muted-text">Chưa gan xe</span>'}</td>
         <td>${item.deviceId}</td>
-        <td>${item.routeNumber ? `${item.routeNumber} - ${item.routeName}` : '<span class="muted-text">Chua co lenh</span>'}</td>
+        <td>${item.routeNumber ? `${item.routeNumber} - ${item.routeName}` : '<span class="muted-text">Chưa co lenh</span>'}</td>
         <td>${item.speed || 0} km/h</td>
         <td>${formatDateTime(item.lastReceivedAt)}</td>
         <td><span class="status-badge ${item.connectionStatus === "online" ? "working" : "left"}">${getMonitoringStatusLabel(item.connectionStatus)}</span></td>
@@ -179,7 +179,7 @@ async function loadRoutesForMonitoring() {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Khong the tai danh sach tuyen.");
+    throw new Error(data.message || "Không thể tai danh sach tuyến.");
   }
 
   routes = data.routes;
@@ -190,7 +190,7 @@ async function loadMonitoringLiveData(showSuccessMessage = false) {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Khong the tai du lieu giam sat truc tiep.");
+    throw new Error(data.message || "Không thể tai du lieu giám sát trực tiếp.");
   }
 
   monitoringSnapshots = data.items;
@@ -203,19 +203,19 @@ async function loadMonitoringLiveData(showSuccessMessage = false) {
   renderMonitoringTable();
 
   if (showSuccessMessage) {
-    setMonitoringPageMessage(`Da tai ${monitoringSnapshots.length} phuong tien co GPS.`, "success");
+    setMonitoringPageMessage(`Đã tải ${monitoringSnapshots.length} phương tiện co GPS.`, "success");
   }
 }
 
 async function loadMonitoringPage(showSuccessMessage = true) {
-  setMonitoringPageMessage("Dang tai du lieu giam sat...");
+  setMonitoringPageMessage("Đang tải du lieu giám sát...");
 
   try {
     await loadRoutesForMonitoring();
     await loadMonitoringLiveData(false);
 
     if (showSuccessMessage) {
-      setMonitoringPageMessage(`Da tai ${monitoringSnapshots.length} phuong tien co GPS.`, "success");
+      setMonitoringPageMessage(`Đã tải ${monitoringSnapshots.length} phương tiện co GPS.`, "success");
     }
   } catch (error) {
     monitoringTableBody.innerHTML = `<tr><td colspan="6">${error.message}</td></tr>`;
@@ -237,8 +237,10 @@ monitoringTableBody?.addEventListener("click", (event) => {
 });
 
 loadMonitoringPage();
+const MONITORING_REFRESH_INTERVAL_MS = 3000;
 setInterval(() => {
   loadMonitoringLiveData(false).catch((error) => {
     setMonitoringPageMessage(error.message, "error");
   });
-}, 15000);
+}, MONITORING_REFRESH_INTERVAL_MS);
+

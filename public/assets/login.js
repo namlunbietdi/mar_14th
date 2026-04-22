@@ -1,4 +1,4 @@
-const loginForm = document.getElementById("loginForm");
+﻿const loginForm = document.getElementById("loginForm");
 const loginMessage = document.getElementById("loginMessage");
 
 loginForm?.addEventListener("submit", async (event) => {
@@ -7,7 +7,7 @@ loginForm?.addEventListener("submit", async (event) => {
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  loginMessage.textContent = "Dang kiem tra thong tin...";
+  loginMessage.textContent = "Dang kiem tra thông tin...";
   loginMessage.className = "form-message";
 
   try {
@@ -22,11 +22,11 @@ loginForm?.addEventListener("submit", async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Dang nhap that bai.");
+      throw new Error(data.message || "Đăng nhập that bai.");
     }
 
     localStorage.setItem("busSystemUser", JSON.stringify(data.user));
-    loginMessage.textContent = "Dang nhap thanh cong. Dang chuyen trang...";
+    loginMessage.textContent = "Đăng nhập thành công. Dang chuyen trang...";
     loginMessage.className = "form-message success";
 
     setTimeout(() => {
@@ -37,3 +37,4 @@ loginForm?.addEventListener("submit", async (event) => {
     loginMessage.className = "form-message error";
   }
 });
+

@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const Vehicle = require("../models/Vehicle");
 const { requireAdmin, requireAuth } = require("../middleware/auth");
 const { mapVehicle } = require("../utils/mappers");
@@ -16,7 +16,7 @@ router.get("/", requireAuth, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the lay danh sach phuong tien."
+      message: "Không thể lay danh sach phương tiện."
     });
   }
 });
@@ -28,7 +28,7 @@ router.post("/", requireAdmin, async (req, res) => {
     if (!licensePlate || !vehicleTypeId || !operationStartDate || !status) {
       return res.status(400).json({
         success: false,
-        message: "Vui long nhap day du thong tin phuong tien."
+        message: "Vui lòng nhap day du thông tin phương tiện."
       });
     }
 
@@ -43,13 +43,13 @@ router.post("/", requireAdmin, async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Da them phuong tien moi.",
+      message: "Đã thêm phương tiện moi.",
       vehicle: mapVehicle(populatedVehicle)
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the them phuong tien."
+      message: "Không thể them phương tiện."
     });
   }
 });
@@ -61,7 +61,7 @@ router.put("/:id", requireAdmin, async (req, res) => {
     if (!licensePlate || !vehicleTypeId || !operationStartDate || !status) {
       return res.status(400).json({
         success: false,
-        message: "Vui long nhap day du thong tin phuong tien."
+        message: "Vui lòng nhap day du thông tin phương tiện."
       });
     }
 
@@ -82,19 +82,19 @@ router.put("/:id", requireAdmin, async (req, res) => {
     if (!vehicle) {
       return res.status(404).json({
         success: false,
-        message: "Khong tim thay phuong tien."
+        message: "Không tìm thấy phương tiện."
       });
     }
 
     return res.json({
       success: true,
-      message: "Da cap nhat phuong tien.",
+      message: "Đã cập nhật phương tiện.",
       vehicle: mapVehicle(vehicle)
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the cap nhat phuong tien."
+      message: "Không thể cap nhat phương tiện."
     });
   }
 });
@@ -106,20 +106,21 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     if (!vehicle) {
       return res.status(404).json({
         success: false,
-        message: "Khong tim thay phuong tien."
+        message: "Không tìm thấy phương tiện."
       });
     }
 
     return res.json({
       success: true,
-      message: "Da xoa phuong tien."
+      message: "Đã xóa phương tiện."
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the xoa phuong tien."
+      message: "Không thể xoa phương tiện."
     });
   }
 });
 
 module.exports = router;
+

@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const Device = require("../models/Device");
 const DeviceAssignment = require("../models/DeviceAssignment");
 const DispatchOrder = require("../models/DispatchOrder");
@@ -32,6 +33,56 @@ async function buildDispatchOrdersResponse(query = {}) {
   );
 
   return orders.map((order) => mapDispatchOrder(order, assignmentMap.get(String(order._id))));
+}
+
+function isValidDateValue(value) {
+  if (!value) return false;
+  const parsedDate = new Date(value);
+  return !Number.isNaN(parsedDate.getTime());
+}
+
+function validateDispatchPayload(payload) {
+  const {
+    routeId,
+    vehicleId,
+    driverId,
+    plannedStartTime,
+    plannedEndTime,
+    actualStartTime,
+    actualEndTime,
+    status,
+    deviceRefId
+  } = payload;
+
+  if (!routeId || !vehicleId || !driverId || !plannedStartTime || !plannedEndTime || !status) {
+    return "Vui long nhap day du thong tin lenh dieu phoi.";
+  }
+
+  if (!isValidDateValue(plannedStartTime) || !isValidDateValue(plannedEndTime)) {
+    return "Thoi gian ke hoach khong hop le.";
+  }
+
+  if (new Date(plannedEndTime).getTime() < new Date(plannedStartTime).getTime()) {
+    return "Thoi gian ket thuc ke hoach phai lon hon hoac bang thoi gian bat dau.";
+  }
+
+  if (actualStartTime && !isValidDateValue(actualStartTime)) {
+    return "Thoi gian bat dau thuc te khong hop le.";
+  }
+
+  if (actualEndTime && !isValidDateValue(actualEndTime)) {
+    return "Thoi gian ket thuc thuc te khong hop le.";
+  }
+
+  if (actualStartTime && actualEndTime && new Date(actualEndTime).getTime() < new Date(actualStartTime).getTime()) {
+    return "Thoi gian ket thuc thuc te phai lon hon hoac bang thoi gian bat dau thuc te.";
+  }
+
+  if (status === "running" && !deviceRefId) {
+    return "Lenh dang chay bat buoc phai gan thiet bi.";
+  }
+
+  return null;
 }
 
 router.get("/", requireAuth, async (req, res) => {
@@ -70,19 +121,39 @@ router.get("/next-code", requireAdmin, async (req, res) => {
 
 router.get("/metadata", requireAuth, async (req, res) => {
   try {
-    const [routes, vehicles, employees, devices] = await Promise.all([
+    const [routes, vehicles, employees, devices, activeAssignments] = await Promise.all([
       Route.find().sort({ routeNumber: 1 }),
       Vehicle.find().populate("vehicleTypeId").sort({ licensePlate: 1 }),
       Employee.find({ status: "working" }).sort({ fullName: 1 }),
-      Device.find({ status: "working" }).sort({ deviceId: 1 })
+      Device.find({ status: "working" }).sort({ deviceId: 1 }),
+      DeviceAssignment.find({ isActive: true }).select("deviceId dispatchOrderId")
     ]);
+
+    const assignmentMap = new Map(
+      activeAssignments.map((item) => [
+        String(item.deviceId),
+        {
+          assignmentId: String(item._id),
+          dispatchOrderId: item.dispatchOrderId ? String(item.dispatchOrderId) : null
+        }
+      ])
+    );
 
     return res.json({
       success: true,
       routes: routes.map(mapRoute),
       vehicles: vehicles.map(mapVehicle),
       employees: employees.map(mapEmployee),
-      devices: devices.map(mapDevice)
+      devices: devices.map((device) => {
+        const mappedDevice = mapDevice(device);
+        const activeAssignment = assignmentMap.get(String(device._id)) || null;
+
+        return {
+          ...mappedDevice,
+          isAssigned: Boolean(activeAssignment),
+          assignedDispatchOrderId: activeAssignment?.dispatchOrderId || null
+        };
+      })
     });
   } catch (error) {
     return res.status(500).json({
@@ -109,47 +180,62 @@ router.post("/", requireAdmin, async (req, res) => {
   } = req.body;
 
   try {
-    if (!routeId || !vehicleId || !driverId || !plannedStartTime || !plannedEndTime || !status) {
+    const validationMessage = validateDispatchPayload(req.body);
+    if (validationMessage) {
       return res.status(400).json({
         success: false,
-        message: "Vui long nhap day du thong tin lenh dieu phoi."
+        message: validationMessage
       });
     }
 
     const orderCode = await getNextDispatchOrderCode();
-    const order = await DispatchOrder.create({
-      orderCode,
-      routeId,
-      vehicleId,
-      driverId,
-      conductorId: conductorId || null,
-      plannedStartTime,
-      plannedEndTime,
-      actualStartTime: actualStartTime || null,
-      actualEndTime: actualEndTime || null,
-      status,
-      note: String(note || "").trim(),
-      createdBy: req.currentUser._id
-    });
-
+    const session = await mongoose.startSession();
     let activeAssignment = null;
+    let populatedOrder = null;
 
-    if (deviceRefId) {
-      activeAssignment = await syncDeviceAssignment({
-        deviceRefId,
-        vehicleId,
-        dispatchOrderId: order._id,
-        assignedBy: req.currentUser._id,
-        note: String(assignmentNote || "").trim(),
-        assignedAt: actualStartTime || plannedStartTime || new Date()
+    try {
+      await session.withTransaction(async () => {
+        const createdOrders = await DispatchOrder.create(
+          [{
+            orderCode,
+            routeId,
+            vehicleId,
+            driverId,
+            conductorId: conductorId || null,
+            plannedStartTime,
+            plannedEndTime,
+            actualStartTime: actualStartTime || null,
+            actualEndTime: actualEndTime || null,
+            status,
+            note: String(note || "").trim(),
+            createdBy: req.currentUser._id
+          }],
+          { session }
+        );
+        const order = createdOrders[0];
+
+        if (deviceRefId) {
+          activeAssignment = await syncDeviceAssignment({
+            deviceRefId,
+            vehicleId,
+            dispatchOrderId: order._id,
+            assignedBy: req.currentUser._id,
+            note: String(assignmentNote || "").trim(),
+            assignedAt: actualStartTime || plannedStartTime || new Date(),
+            session
+          });
+        }
+
+        populatedOrder = await DispatchOrder.findById(order._id)
+          .session(session)
+          .populate("routeId")
+          .populate("vehicleId")
+          .populate("driverId")
+          .populate("conductorId");
       });
+    } finally {
+      await session.endSession();
     }
-
-    const populatedOrder = await DispatchOrder.findById(order._id)
-      .populate("routeId")
-      .populate("vehicleId")
-      .populate("driverId")
-      .populate("conductorId");
 
     return res.status(201).json({
       success: true,
@@ -157,9 +243,9 @@ router.post("/", requireAdmin, async (req, res) => {
       order: mapDispatchOrder(populatedOrder, activeAssignment)
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
-      message: "Khong the tao lenh dieu phoi."
+      message: error.message || "Khong the tao lenh dieu phoi."
     });
   }
 });
@@ -181,62 +267,70 @@ router.put("/:id", requireAdmin, async (req, res) => {
   } = req.body;
 
   try {
-    if (!routeId || !vehicleId || !driverId || !plannedStartTime || !plannedEndTime || !status) {
+    const validationMessage = validateDispatchPayload(req.body);
+    if (validationMessage) {
       return res.status(400).json({
         success: false,
-        message: "Vui long nhap day du thong tin lenh dieu phoi."
+        message: validationMessage
       });
     }
 
-    const order = await DispatchOrder.findByIdAndUpdate(
-      req.params.id,
-      {
-        routeId,
-        vehicleId,
-        driverId,
-        conductorId: conductorId || null,
-        plannedStartTime,
-        plannedEndTime,
-        actualStartTime: actualStartTime || null,
-        actualEndTime: actualEndTime || null,
-        status,
-        note: String(note || "").trim()
-      },
-      {
-        new: true,
-        runValidators: true
-      }
-    )
-      .populate("routeId")
-      .populate("vehicleId")
-      .populate("driverId")
-      .populate("conductorId");
-
-    if (!order) {
-      return res.status(404).json({
-        success: false,
-        message: "Khong tim thay lenh dieu phoi."
-      });
-    }
-
+    const session = await mongoose.startSession();
     let activeAssignment = null;
+    let order = null;
 
-    if (deviceRefId) {
-      activeAssignment = await syncDeviceAssignment({
-        deviceRefId,
-        vehicleId,
-        dispatchOrderId: order._id,
-        assignedBy: req.currentUser._id,
-        note: String(assignmentNote || "").trim(),
-        assignedAt: actualStartTime || plannedStartTime || new Date()
+    try {
+      await session.withTransaction(async () => {
+        order = await DispatchOrder.findByIdAndUpdate(
+          req.params.id,
+          {
+            routeId,
+            vehicleId,
+            driverId,
+            conductorId: conductorId || null,
+            plannedStartTime,
+            plannedEndTime,
+            actualStartTime: actualStartTime || null,
+            actualEndTime: actualEndTime || null,
+            status,
+            note: String(note || "").trim()
+          },
+          {
+            new: true,
+            runValidators: true,
+            session
+          }
+        )
+          .populate("routeId")
+          .populate("vehicleId")
+          .populate("driverId")
+          .populate("conductorId");
+
+        if (!order) {
+          throw new Error("NOT_FOUND");
+        }
+
+        if (deviceRefId) {
+          activeAssignment = await syncDeviceAssignment({
+            deviceRefId,
+            vehicleId,
+            dispatchOrderId: order._id,
+            assignedBy: req.currentUser._id,
+            note: String(assignmentNote || "").trim(),
+            assignedAt: actualStartTime || plannedStartTime || new Date(),
+            session
+          });
+        } else {
+          await deactivateAssignmentsByDispatchOrder(order._id, new Date(), session);
+        }
+
+        if (["completed", "cancelled"].includes(status)) {
+          await deactivateAssignmentsByDispatchOrder(order._id, actualEndTime || new Date(), session);
+          activeAssignment = null;
+        }
       });
-    } else {
-      await deactivateAssignmentsByDispatchOrder(order._id);
-    }
-
-    if (["completed", "cancelled"].includes(status)) {
-      await deactivateAssignmentsByDispatchOrder(order._id, actualEndTime || new Date());
-      activeAssignment = null;
+    } finally {
+      await session.endSession();
     }
 
     return res.json({
@@ -245,34 +339,53 @@ router.put("/:id", requireAdmin, async (req, res) => {
       order: mapDispatchOrder(order, activeAssignment)
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Khong the cap nhat lenh dieu phoi."
-    });
-  }
-});
-
-router.delete("/:id", requireAdmin, async (req, res) => {
-  try {
-    const order = await DispatchOrder.findByIdAndDelete(req.params.id);
-
-    if (!order) {
+    if (error.message === "NOT_FOUND") {
       return res.status(404).json({
         success: false,
         message: "Khong tim thay lenh dieu phoi."
       });
     }
 
-    await deactivateAssignmentsByDispatchOrder(order._id);
+    return res.status(400).json({
+      success: false,
+      message: error.message || "Khong the cap nhat lenh dieu phoi."
+    });
+  }
+});
+
+router.delete("/:id", requireAdmin, async (req, res) => {
+  try {
+    const session = await mongoose.startSession();
+
+    try {
+      await session.withTransaction(async () => {
+        const order = await DispatchOrder.findByIdAndDelete(req.params.id).session(session);
+
+        if (!order) {
+          throw new Error("NOT_FOUND");
+        }
+
+        await deactivateAssignmentsByDispatchOrder(order._id, new Date(), session);
+      });
+    } finally {
+      await session.endSession();
+    }
 
     return res.json({
       success: true,
       message: "Da xoa lenh dieu phoi."
     });
   } catch (error) {
-    return res.status(500).json({
+    if (error.message === "NOT_FOUND") {
+      return res.status(404).json({
+        success: false,
+        message: "Khong tim thay lenh dieu phoi."
+      });
+    }
+
+    return res.status(400).json({
       success: false,
-      message: "Khong the xoa lenh dieu phoi."
+      message: error.message || "Khong the xoa lenh dieu phoi."
     });
   }
 });

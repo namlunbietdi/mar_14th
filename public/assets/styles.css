@@ -422,7 +422,7 @@ h1 {
 }
 
 .device-table {
-  min-width: 920px;
+  min-width: 1320px;
 }
 
 .data-table th,
@@ -552,6 +552,10 @@ h1 {
 
 .modal-backdrop.hidden {
   display: none;
+}
+
+.hidden {
+  display: none !important;
 }
 
 .modal-card {
@@ -795,6 +799,100 @@ h1 {
 
 .route-map-shell {
   position: relative;
+}
+
+.route-direction-editor {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.76);
+  display: grid;
+  gap: 14px;
+}
+
+.route-direction-header,
+.direction-tab-row,
+.direction-add-row,
+.direction-runtime-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.route-direction-header {
+  justify-content: space-between;
+}
+
+.route-direction-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.direction-add-row select {
+  min-width: 320px;
+  max-width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+}
+
+.direction-order-table {
+  min-width: 900px;
+}
+
+.direction-order-table input[type="text"] {
+  width: 120px;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+}
+
+.direction-draggable-row td {
+  vertical-align: middle;
+}
+
+.direction-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px dashed rgba(13, 59, 128, 0.34);
+  color: var(--primary-dark);
+  background: rgba(21, 101, 192, 0.08);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: grab;
+  user-select: none;
+}
+
+.direction-drag-handle:active {
+  cursor: grabbing;
+}
+
+.direction-dragging {
+  opacity: 0.55;
+}
+
+.direction-drop-target td {
+  background: rgba(79, 195, 247, 0.16);
+}
+
+.runtime-preview {
+  margin: 0;
+  max-height: 260px;
+  overflow: auto;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: #0a2342;
+  color: #d6e6ff;
+  font-size: 12px;
 }
 
 .map-overlay {

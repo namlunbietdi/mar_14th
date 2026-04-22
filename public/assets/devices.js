@@ -1,4 +1,4 @@
-const currentDeviceUser = window.busApp?.getStoredUser();
+﻿const currentDeviceUser = window.busApp?.getStoredUser();
 const deviceTableBody = document.getElementById("deviceTableBody");
 const devicePageMessage = document.getElementById("devicePageMessage");
 const openDeviceModalBtn = document.getElementById("openDeviceModalBtn");
@@ -49,9 +49,37 @@ function getDeviceStatusClass(status) {
   return "left";
 }
 
+function downloadBlob(content, filename, type) {
+  const blob = new Blob([content], { type });
+  const url = window.URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  window.URL.revokeObjectURL(url);
+}
+
+async function exportDeviceSdPackage(device) {
+  try {
+    const response = await window.busApp.authFetch(`/api/devices/${device.id}/sd-package`, { headers: {} });
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || "Khong the xuat goi SD.");
+    }
+
+    const packageContent = await response.text();
+    downloadBlob(packageContent, `sd-package-${device.deviceId}.json`, "application/json;charset=utf-8;");
+    setDevicePageMessage("Da tai goi SD card.", "success");
+  } catch (error) {
+    setDevicePageMessage(error.message, "error");
+  }
+}
+
 function renderDevices() {
   if (!devices.length) {
-    deviceTableBody.innerHTML = `<tr><td colspan="6">Chua co thiet bi nao.</td></tr>`;
+    deviceTableBody.innerHTML = `<tr><td colspan="7">Chưa co thiết bị nao.</td></tr>`;
     return;
   }
 
@@ -64,28 +92,29 @@ function renderDevices() {
         <td>${device.remainingLabel}</td>
         <td>${formatDate(device.nextMaintenanceDate)}</td>
         <td><span class="status-badge ${getDeviceStatusClass(device.status)}">${getDeviceStatusLabel(device.status)}</span></td>
-        <td>${canManage ? `<div class="action-group"><button class="link-btn" type="button" data-action="edit" data-id="${device.id}">Sua</button><button class="link-btn danger" type="button" data-action="delete" data-id="${device.id}">Xoa</button></div>` : '<span class="muted-text">Khong co quyen</span>'}</td>
+        <td><button class="link-btn" type="button" data-action="export-sd" data-id="${device.id}">Xuat SD</button></td>
+        <td>${canManage ? `<div class="action-group"><button class="link-btn" type="button" data-action="edit" data-id="${device.id}">Sua</button><button class="link-btn danger" type="button" data-action="delete" data-id="${device.id}">Xoa</button></div>` : '<span class="muted-text">Không co quyen</span>'}</td>
       </tr>
     `)
     .join("");
 }
 
 async function loadDevices() {
-  setDevicePageMessage("Dang tai danh sach thiet bi...");
+  setDevicePageMessage("Đang tải danh sach thiết bị...");
 
   try {
     const response = await window.busApp.authFetch("/api/devices");
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the tai danh sach thiet bi.");
+      throw new Error(data.message || "Không thể tai danh sach thiết bị.");
     }
 
     devices = data.devices;
     renderDevices();
-    setDevicePageMessage(`Da tai ${devices.length} thiet bi.`, "success");
+    setDevicePageMessage(`Đã tải ${devices.length} thiết bị.`, "success");
   } catch (error) {
-    deviceTableBody.innerHTML = `<tr><td colspan="6">${error.message}</td></tr>`;
+    deviceTableBody.innerHTML = `<tr><td colspan="7">${error.message}</td></tr>`;
     setDevicePageMessage(error.message, "error");
   }
 }
@@ -98,7 +127,7 @@ function openDeviceModal(mode, device = null) {
   deviceForm.reset();
   setDeviceFormMessage("");
   editingDeviceId.value = device?.id || "";
-  deviceModalTitle.textContent = mode === "edit" ? "Chinh sua thiet bi" : "Them thiet bi";
+  deviceModalTitle.textContent = mode === "edit" ? "Chỉnh sửa thiết bị" : "Them thiết bị";
 
   if (mode === "edit" && device) {
     deviceIdInput.value = device.deviceId;
@@ -138,7 +167,7 @@ deviceForm?.addEventListener("submit", async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Khong the luu thiet bi.");
+      throw new Error(data.message || "Không thể luu thiết bị.");
     }
 
     setDevicePageMessage(data.message, "success");
@@ -159,12 +188,16 @@ deviceTableBody?.addEventListener("click", async (event) => {
 
   const selectedDevice = devices.find((device) => device.id === deviceId);
 
+  if (action === "export-sd" && selectedDevice) {
+    await exportDeviceSdPackage(selectedDevice);
+  }
+
   if (action === "edit" && selectedDevice) {
     openDeviceModal("edit", selectedDevice);
   }
 
   if (action === "delete") {
-    const confirmed = window.confirm("Ban co chac chan muon xoa thiet bi nay khong?");
+    const confirmed = window.confirm("Ban co chac chan muon xoa thiết bị nay không?");
 
     if (!confirmed) {
       return;
@@ -177,7 +210,7 @@ deviceTableBody?.addEventListener("click", async (event) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Khong the xoa thiet bi.");
+        throw new Error(data.message || "Không thể xoa thiết bị.");
       }
 
       setDevicePageMessage(data.message, "success");
@@ -189,3 +222,4 @@ deviceTableBody?.addEventListener("click", async (event) => {
 });
 
 loadDevices();
+

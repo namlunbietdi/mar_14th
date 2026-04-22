@@ -1,4 +1,4 @@
-const currentVehicleUser = window.busApp?.getStoredUser();
+﻿const currentVehicleUser = window.busApp?.getStoredUser();
 const vehicleTableBody = document.getElementById("vehicleTableBody");
 const vehiclePageMessage = document.getElementById("vehiclePageMessage");
 const openVehicleTypeModalBtn = document.getElementById("openVehicleTypeModalBtn");
@@ -62,14 +62,14 @@ function formatVehicleDate(dateValue) {
 }
 
 function getVehicleStatusLabel(status) {
-  if (status === "active") return "Hoat dong";
-  if (status === "maintenance") return "Bao tri";
-  return "Dung hoat dong";
+  if (status === "active") return "Hoạt động";
+  if (status === "maintenance") return "Bảo trì";
+  return "Dung hoạt động";
 }
 
 function renderVehicleTypesTable() {
   if (!vehicleTypes.length) {
-    vehicleTypeTableBody.innerHTML = `<tr><td colspan="4">Chua co loai phuong tien.</td></tr>`;
+    vehicleTypeTableBody.innerHTML = `<tr><td colspan="4">Chưa co loai phương tiện.</td></tr>`;
     return;
   }
 
@@ -80,7 +80,7 @@ function renderVehicleTypesTable() {
         <td>${vehicleType.brand}</td>
         <td>${vehicleType.modelName}</td>
         <td>${vehicleType.capacity}</td>
-        <td>${canManage ? `<button class="link-btn danger" type="button" data-action="delete-type" data-id="${vehicleType.id}">Xoa</button>` : '<span class="muted-text">Khong co quyen</span>'}</td>
+        <td>${canManage ? `<button class="link-btn danger" type="button" data-action="delete-type" data-id="${vehicleType.id}">Xoa</button>` : '<span class="muted-text">Không co quyen</span>'}</td>
       </tr>
     `)
     .join("");
@@ -107,7 +107,7 @@ function updateCapacityDisplay() {
 
 function renderVehicles() {
   if (!vehicles.length) {
-    vehicleTableBody.innerHTML = `<tr><td colspan="8">Chua co phuong tien nao.</td></tr>`;
+    vehicleTableBody.innerHTML = `<tr><td colspan="8">Chưa co phương tiện nao.</td></tr>`;
     return;
   }
 
@@ -122,14 +122,14 @@ function renderVehicles() {
         <td>${formatVehicleDate(vehicle.operationStartDate)}</td>
         <td>${formatVehicleDate(vehicle.expiryDate)}</td>
         <td><span class="status-badge ${vehicle.status === "active" ? "working" : "left"}">${getVehicleStatusLabel(vehicle.status)}</span></td>
-        <td>${canManage ? `<div class="action-group"><button class="link-btn" type="button" data-action="edit-vehicle" data-id="${vehicle.id}">Sua</button><button class="link-btn danger" type="button" data-action="delete-vehicle" data-id="${vehicle.id}">Xoa</button></div>` : '<span class="muted-text">Khong co quyen</span>'}</td>
+        <td>${canManage ? `<div class="action-group"><button class="link-btn" type="button" data-action="edit-vehicle" data-id="${vehicle.id}">Sua</button><button class="link-btn danger" type="button" data-action="delete-vehicle" data-id="${vehicle.id}">Xoa</button></div>` : '<span class="muted-text">Không co quyen</span>'}</td>
       </tr>
     `)
     .join("");
 }
 
 async function loadVehicles() {
-  setVehiclePageMessage("Dang tai danh sach phuong tien...");
+  setVehiclePageMessage("Đang tải danh sach phương tiện...");
   try {
     const [vehicleTypesResponse, vehiclesResponse] = await Promise.all([
       window.busApp.authFetch("/api/vehicle-types"),
@@ -138,15 +138,15 @@ async function loadVehicles() {
     const vehicleTypesData = await vehicleTypesResponse.json();
     const vehiclesData = await vehiclesResponse.json();
 
-    if (!vehicleTypesResponse.ok) throw new Error(vehicleTypesData.message || "Khong the tai loai phuong tien.");
-    if (!vehiclesResponse.ok) throw new Error(vehiclesData.message || "Khong the tai danh sach phuong tien.");
+    if (!vehicleTypesResponse.ok) throw new Error(vehicleTypesData.message || "Không thể tai loai phương tiện.");
+    if (!vehiclesResponse.ok) throw new Error(vehiclesData.message || "Không thể tai danh sach phương tiện.");
 
     vehicleTypes = vehicleTypesData.vehicleTypes;
     vehicles = vehiclesData.vehicles;
     renderVehicleTypesTable();
     renderBrandOptions();
     renderVehicles();
-    setVehiclePageMessage(`Da tai ${vehicles.length} phuong tien.`, "success");
+    setVehiclePageMessage(`Đã tải ${vehicles.length} phương tiện.`, "success");
   } catch (error) {
     vehicleTableBody.innerHTML = `<tr><td colspan="8">${error.message}</td></tr>`;
     setVehiclePageMessage(error.message, "error");
@@ -177,7 +177,7 @@ vehicleTypeForm?.addEventListener("submit", async (event) => {
       })
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || "Khong the them loai phuong tien.");
+    if (!response.ok) throw new Error(data.message || "Không thể them loai phương tiện.");
     setVehiclePageMessage(data.message, "success");
     closeVehicleTypeModal();
     await loadVehicles();
@@ -188,11 +188,11 @@ vehicleTypeForm?.addEventListener("submit", async (event) => {
 
 vehicleTypeTableBody?.addEventListener("click", async (event) => {
   if (event.target.dataset.action !== "delete-type") return;
-  if (!window.confirm("Ban co chac chan muon xoa loai phuong tien nay khong?")) return;
+  if (!window.confirm("Ban co chac chan muon xoa loai phương tiện nay không?")) return;
   try {
     const response = await window.busApp.authFetch(`/api/vehicle-types/${event.target.dataset.id}`, { method: "DELETE" });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || "Khong the xoa loai phuong tien.");
+    if (!response.ok) throw new Error(data.message || "Không thể xoa loai phương tiện.");
     setVehiclePageMessage(data.message, "success");
     await loadVehicles();
   } catch (error) {
@@ -205,7 +205,7 @@ function openVehicleModal(mode, vehicle = null) {
   vehicleForm.reset();
   setVehicleFormMessage("");
   editingVehicleId.value = vehicle?.id || "";
-  vehicleModalTitle.textContent = mode === "edit" ? "Chinh sua phuong tien" : "Them phuong tien";
+  vehicleModalTitle.textContent = mode === "edit" ? "Chỉnh sửa phương tiện" : "Them phương tiện";
   renderBrandOptions();
 
   if (mode === "edit" && vehicle) {
@@ -245,7 +245,7 @@ vehicleForm?.addEventListener("submit", async (event) => {
       body: JSON.stringify(payload)
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || "Khong the luu phuong tien.");
+    if (!response.ok) throw new Error(data.message || "Không thể luu phương tiện.");
     setVehiclePageMessage(data.message, "success");
     closeVehicleModal();
     await loadVehicles();
@@ -265,11 +265,11 @@ vehicleTableBody?.addEventListener("click", async (event) => {
   }
 
   if (action === "delete-vehicle") {
-    if (!window.confirm("Ban co chac chan muon xoa phuong tien nay khong?")) return;
+    if (!window.confirm("Ban co chac chan muon xoa phương tiện nay không?")) return;
     try {
       const response = await window.busApp.authFetch(`/api/vehicles/${vehicleId}`, { method: "DELETE" });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Khong the xoa phuong tien.");
+      if (!response.ok) throw new Error(data.message || "Không thể xoa phương tiện.");
       setVehiclePageMessage(data.message, "success");
       await loadVehicles();
     } catch (error) {
@@ -279,3 +279,4 @@ vehicleTableBody?.addEventListener("click", async (event) => {
 });
 
 loadVehicles();
+

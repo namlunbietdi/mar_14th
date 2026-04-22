@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const Stop = require("../models/Stop");
 const { requireAdmin, requireAuth } = require("../middleware/auth");
 const { getNextStopCode, peekNextStopCode } = require("../utils/codes");
@@ -22,7 +22,7 @@ router.get("/", requireAuth, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the lay danh sach diem dung."
+      message: "Không thể lay danh sach điểm dừng."
     });
   }
 });
@@ -38,7 +38,7 @@ router.get("/next-code", requireAdmin, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the tao ma diem dung."
+      message: "Không thể tao ma điểm dừng."
     });
   }
 });
@@ -49,7 +49,7 @@ router.get("/export", requireAuth, async (req, res) => {
       .populate("routeIds")
       .populate("servedRoutes.routeId")
       .sort({ stopCode: 1 });
-    const header = ["Ma diem dung", "Ten diem dung", "Kinh do", "Vi do", "Cac tuyen di qua", "La diem dau/cuoi"];
+    const header = ["Ma điểm dừng", "Ten điểm dừng", "Kinh do", "Vi do", "Cac tuyến di qua", "La diem dau/cuoi"];
     const rows = stops.map((stop) => {
       const mappedStop = mapStop(stop);
       return [
@@ -58,7 +58,7 @@ router.get("/export", requireAuth, async (req, res) => {
         mappedStop.longitude,
         mappedStop.latitude,
         mappedStop.routeNumbers.join("; "),
-        mappedStop.isEndpoint ? "Co" : "Khong"
+        mappedStop.isEndpoint ? "Co" : "Không"
       ];
     });
 
@@ -72,7 +72,7 @@ router.get("/export", requireAuth, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the export danh sach diem dung."
+      message: "Không thể export danh sach điểm dừng."
     });
   }
 });
@@ -84,7 +84,7 @@ router.post("/", requireAdmin, async (req, res) => {
     if (!stopName || longitude === undefined || latitude === undefined) {
       return res.status(400).json({
         success: false,
-        message: "Vui long nhap day du thong tin diem dung."
+        message: "Vui lòng nhap day du thông tin điểm dừng."
       });
     }
 
@@ -103,13 +103,13 @@ router.post("/", requireAdmin, async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Da them diem dung moi.",
+      message: "Đã thêm điểm dừng moi.",
       stop: mapStop(populatedStop)
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the them diem dung."
+      message: "Không thể them điểm dừng."
     });
   }
 });
@@ -137,19 +137,19 @@ router.put("/:id", requireAdmin, async (req, res) => {
     if (!stop) {
       return res.status(404).json({
         success: false,
-        message: "Khong tim thay diem dung."
+        message: "Không tìm thấy điểm dừng."
       });
     }
 
     return res.json({
       success: true,
-      message: "Da cap nhat diem dung.",
+      message: "Đã cập nhật điểm dừng.",
       stop: mapStop(stop)
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the cap nhat diem dung."
+      message: "Không thể cap nhat điểm dừng."
     });
   }
 });
@@ -161,20 +161,21 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     if (!stop) {
       return res.status(404).json({
         success: false,
-        message: "Khong tim thay diem dung."
+        message: "Không tìm thấy điểm dừng."
       });
     }
 
     return res.json({
       success: true,
-      message: "Da xoa diem dung."
+      message: "Đã xóa điểm dừng."
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the xoa diem dung."
+      message: "Không thể xoa điểm dừng."
     });
   }
 });
 
 module.exports = router;
+

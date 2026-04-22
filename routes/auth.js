@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const { mapUser } = require("../utils/mappers");
@@ -14,7 +14,7 @@ router.post("/login", async (req, res) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Sai ten dang nhap hoac mat khau."
+        message: "Sai ten dang nhap hoac mật khẩu."
       });
     }
 
@@ -23,7 +23,7 @@ router.post("/login", async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: "Sai ten dang nhap hoac mat khau."
+        message: "Sai ten dang nhap hoac mật khẩu."
       });
     }
 
@@ -34,9 +34,10 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the dang nhap luc nay."
+      message: "Không thể dang nhap luc nay."
     });
   }
 });
 
 module.exports = router;
+

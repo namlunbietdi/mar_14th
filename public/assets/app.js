@@ -1,4 +1,4 @@
-const savedUser = localStorage.getItem("busSystemUser");
+﻿const savedUser = localStorage.getItem("busSystemUser");
 const currentUser = document.getElementById("currentUser");
 const logoutBtn = document.getElementById("logoutBtn");
 const userMenuButton = document.getElementById("userMenuButton");
@@ -51,7 +51,7 @@ userMenuButton?.addEventListener("click", () => {
 
 editProfileBtn?.addEventListener("click", (event) => {
   event.preventDefault();
-  alert("Chuc nang chinh sua thong tin ca nhan se duoc phat trien o buoc tiep theo.");
+  alert("Chuc nang chỉnh sửa thông tin ca nhan se duoc phat trien o buoc tiep theo.");
   userDropdown?.classList.remove("open");
 });
 
@@ -66,3 +66,4 @@ document.addEventListener("click", (event) => {
     userDropdown.classList.remove("open");
   }
 });
+

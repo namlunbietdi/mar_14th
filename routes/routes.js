@@ -1,7 +1,8 @@
-const express = require("express");
+﻿const express = require("express");
 const Route = require("../models/Route");
 const { requireAdmin, requireAuth } = require("../middleware/auth");
 const { mapRoute } = require("../utils/mappers");
+const { buildRouteRuntimeConfig } = require("../services/runtime-config");
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.get("/", requireAuth, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the lay danh sach tuyen."
+      message: "Không thể lay danh sach tuyến."
     });
   }
 });
@@ -28,7 +29,7 @@ router.post("/", requireAdmin, async (req, res) => {
     if (!routeNumber || !routeName || !startPoint || !endPoint) {
       return res.status(400).json({
         success: false,
-        message: "Vui long nhap day du thong tin tuyen."
+        message: "Vui lòng nhap day du thông tin tuyến."
       });
     }
 
@@ -43,13 +44,13 @@ router.post("/", requireAdmin, async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Da them tuyen moi.",
+      message: "Đã thêm tuyến moi.",
       route: mapRoute(route)
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the them tuyen."
+      message: "Không thể them tuyến."
     });
   }
 });
@@ -77,19 +78,19 @@ router.put("/:id", requireAdmin, async (req, res) => {
     if (!route) {
       return res.status(404).json({
         success: false,
-        message: "Khong tim thay tuyen."
+        message: "Không tìm thấy tuyến."
       });
     }
 
     return res.json({
       success: true,
-      message: "Da cap nhat tuyen.",
+      message: "Đã cập nhật tuyến.",
       route: mapRoute(route)
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the cap nhat tuyen."
+      message: "Không thể cap nhat tuyến."
     });
   }
 });
@@ -101,18 +102,18 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     if (!route) {
       return res.status(404).json({
         success: false,
-        message: "Khong tim thay tuyen."
+        message: "Không tìm thấy tuyến."
       });
     }
 
     return res.json({
       success: true,
-      message: "Da xoa tuyen."
+      message: "Đã xóa tuyến."
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the xoa tuyen."
+      message: "Không thể xoa tuyến."
     });
   }
 });
@@ -124,7 +125,7 @@ router.post("/:id/geojson/:direction", requireAdmin, async (req, res) => {
   if (!["outbound", "inbound"].includes(direction)) {
     return res.status(400).json({
       success: false,
-      message: "Huong lo trinh khong hop le."
+      message: "Huong lộ trình không hợp lệ."
     });
   }
 
@@ -139,21 +140,45 @@ router.post("/:id/geojson/:direction", requireAdmin, async (req, res) => {
     if (!route) {
       return res.status(404).json({
         success: false,
+        message: "Không tìm thấy tuyến."
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: `Đã cập nhật mô phỏng ${direction === "outbound" ? "lượt đi" : "lượt về"}.`,
+      route: mapRoute(route)
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Không thể cap nhat mô phỏng lộ trình."
+    });
+  }
+});
+
+router.get("/:id/runtime-config", requireAuth, async (req, res) => {
+  try {
+    const config = await buildRouteRuntimeConfig(req.params.id);
+
+    if (!config) {
+      return res.status(404).json({
+        success: false,
         message: "Khong tim thay tuyen."
       });
     }
 
     return res.json({
       success: true,
-      message: `Da cap nhat mo phong ${direction === "outbound" ? "luot di" : "luot ve"}.`,
-      route: mapRoute(route)
+      config
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the cap nhat mo phong lo trinh."
+      message: "Khong the tao runtime config cho tuyen."
     });
   }
 });
 
 module.exports = router;
+

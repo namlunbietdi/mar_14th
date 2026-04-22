@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const Device = require("../models/Device");
 const DeviceAssignment = require("../models/DeviceAssignment");
 const DeviceLastState = require("../models/DeviceLastState");
@@ -37,7 +37,7 @@ router.get("/live", requireAuth, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the tai du lieu giam sat truc tiep."
+      message: "Không thể tai du lieu giám sát trực tiếp."
     });
   }
 });
@@ -70,7 +70,7 @@ router.get("/history", requireAuth, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the tai lich su giam sat."
+      message: "Không thể tai lịch sử giám sát."
     });
   }
 });
@@ -95,7 +95,7 @@ router.get("/unassigned-devices", requireAuth, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the tai danh sach thiet bi chua duoc gan."
+      message: "Không thể tai danh sach thiết bị chua duoc gan."
     });
   }
 });
@@ -111,15 +111,16 @@ router.post("/ingest", requireAdmin, async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Da ghi nhan ban tin telemetry.",
+      message: "Đã ghi nhận bản tin telemetry.",
       result
     });
   } catch (error) {
     return res.status(400).json({
       success: false,
-      message: error.message || "Khong the xu ly ban tin telemetry."
+      message: error.message || "Không thể xu ly bản tin telemetry."
     });
   }
 });
 
 module.exports = router;
+

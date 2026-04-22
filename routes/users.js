@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const { requireAdmin, requireAuth } = require("../middleware/auth");
@@ -30,7 +30,7 @@ router.get("/", requireAuth, async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the lay danh sach nguoi dung."
+      message: "Không thể lay danh sach người dùng."
     });
   }
 });
@@ -42,7 +42,7 @@ router.post("/", requireAdmin, async (req, res) => {
     if (!username || !password || !role || !fullName || !position) {
       return res.status(400).json({
         success: false,
-        message: "Vui long nhap day du thong tin nguoi dung."
+        message: "Vui lòng nhap day du thông tin người dùng."
       });
     }
 
@@ -67,13 +67,13 @@ router.post("/", requireAdmin, async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Da them nguoi dung moi.",
+      message: "Đã thêm người dùng moi.",
       user: mapUser(user)
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the them nguoi dung."
+      message: "Không thể them người dùng."
     });
   }
 });
@@ -85,7 +85,7 @@ router.put("/:id", requireAdmin, async (req, res) => {
     if (!username || !role || !fullName || !position) {
       return res.status(400).json({
         success: false,
-        message: "Vui long nhap day du thong tin nguoi dung."
+        message: "Vui lòng nhap day du thông tin người dùng."
       });
     }
 
@@ -120,19 +120,19 @@ router.put("/:id", requireAdmin, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Khong tim thay nguoi dung."
+        message: "Không tìm thấy người dùng."
       });
     }
 
     return res.json({
       success: true,
-      message: "Da cap nhat nguoi dung.",
+      message: "Đã cập nhật người dùng.",
       user: mapUser(user)
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the cap nhat nguoi dung."
+      message: "Không thể cap nhat người dùng."
     });
   }
 });
@@ -142,7 +142,7 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     if (String(req.currentUser._id) === req.params.id) {
       return res.status(400).json({
         success: false,
-        message: "Khong the xoa tai khoan dang dang nhap."
+        message: "Không thể xoa tài khoản dang dang nhap."
       });
     }
 
@@ -151,18 +151,18 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Khong tim thay nguoi dung."
+        message: "Không tìm thấy người dùng."
       });
     }
 
     return res.json({
       success: true,
-      message: "Da xoa nguoi dung."
+      message: "Đã xóa người dùng."
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the xoa nguoi dung."
+      message: "Không thể xoa người dùng."
     });
   }
 });
@@ -180,20 +180,21 @@ router.post("/:id/reset-password", requireAdmin, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Khong tim thay nguoi dung."
+        message: "Không tìm thấy người dùng."
       });
     }
 
     return res.json({
       success: true,
-      message: `Da reset mat khau cho ${user.username} ve 123456.`
+      message: `Đã reset mật khẩu cho ${user.username} ve 123456.`
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Khong the reset mat khau."
+      message: "Không thể reset mật khẩu."
     });
   }
 });
 
 module.exports = router;
+

@@ -1,6 +1,6 @@
 const DeviceAssignment = require("../models/DeviceAssignment");
 
-async function deactivateAssignments(filter, unassignedAt = new Date()) {
+async function deactivateAssignments(filter, unassignedAt = new Date(), session = null) {
   await DeviceAssignment.updateMany(
     {
       ...filter,
@@ -9,7 +9,8 @@ async function deactivateAssignments(filter, unassignedAt = new Date()) {
     {
       isActive: false,
       unassignedAt
-    }
+    },
+    session ? { session } : undefined
   );
 }
 
@@ -19,10 +20,21 @@ async function syncDeviceAssignment({
   dispatchOrderId,
   assignedBy,
   note = "",
-  assignedAt = new Date()
+  assignedAt = new Date(),
+  session = null
 }) {
   if (!deviceRefId || !vehicleId || !dispatchOrderId || !assignedBy) {
     return null;
+  }
+
+  const conflictingAssignment = await DeviceAssignment.findOne({
+    deviceId: deviceRefId,
+    isActive: true,
+    dispatchOrderId: { $ne: dispatchOrderId }
+  }).session(session);
+
+  if (conflictingAssignment) {
+    throw new Error("Thiet bi dang duoc gan cho lenh dieu phoi khac.");
   }
 
   const existingAssignment = await DeviceAssignment.findOne({
@@ -30,12 +42,14 @@ async function syncDeviceAssignment({
     vehicleId,
     dispatchOrderId,
     isActive: true
-  }).populate("deviceId");
+  })
+    .session(session)
+    .populate("deviceId");
 
   if (existingAssignment) {
     if (existingAssignment.note !== note) {
       existingAssignment.note = note;
-      await existingAssignment.save();
+      await existingAssignment.save({ session });
     }
 
     return existingAssignment;
@@ -47,27 +61,33 @@ async function syncDeviceAssignment({
       { vehicleId },
       { dispatchOrderId }
     ]
-  }, assignedAt);
+  }, assignedAt, session);
 
-  const assignment = await DeviceAssignment.create({
-    deviceId: deviceRefId,
-    vehicleId,
-    dispatchOrderId,
-    assignedBy,
-    note,
-    assignedAt,
-    isActive: true
-  });
+  const createdAssignments = await DeviceAssignment.create(
+    [{
+      deviceId: deviceRefId,
+      vehicleId,
+      dispatchOrderId,
+      assignedBy,
+      note,
+      assignedAt,
+      isActive: true
+    }],
+    session ? { session } : undefined
+  );
+  const assignmentId = createdAssignments[0]._id;
 
-  return DeviceAssignment.findById(assignment._id).populate("deviceId");
+  return DeviceAssignment.findById(assignmentId)
+    .session(session)
+    .populate("deviceId");
 }
 
-async function deactivateAssignmentsByDispatchOrder(dispatchOrderId, unassignedAt = new Date()) {
+async function deactivateAssignmentsByDispatchOrder(dispatchOrderId, unassignedAt = new Date(), session = null) {
   if (!dispatchOrderId) {
     return;
   }
 
-  await deactivateAssignments({ dispatchOrderId }, unassignedAt);
+  await deactivateAssignments({ dispatchOrderId }, unassignedAt, session);
 }
 
 module.exports = {
