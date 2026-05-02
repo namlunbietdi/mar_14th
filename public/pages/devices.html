@@ -47,6 +47,7 @@
             <tr>
               <th>ID</th>
               <th>Ngày bắt đầu vận doanh</th>
+              <th>Config version</th>
               <th>Niên hạn còn lại</th>
               <th>Thời gian bảo trì kế tiếp</th>
               <th>Trạng thái</th>
@@ -56,7 +57,7 @@
           </thead>
           <tbody id="deviceTableBody">
             <tr>
-              <td colspan="7">Đang tải dữ liệu...</td>
+              <td colspan="8">Đang tải dữ liệu...</td>
             </tr>
           </tbody>
         </table>
@@ -94,6 +95,11 @@
             <option value="issue">Trở ngại</option>
             <option value="removed">Loại bỏ</option>
           </select>
+        </label>
+
+        <label class="field">
+          <span>Config version</span>
+          <input id="deviceConfigVersionInput" type="number" min="1" step="1" value="1" required>
         </label>
 
         <p id="deviceFormHint" class="form-hint">Bảo trì kế tiếp được tính tự động sau 07 ngày kể từ thời điểm tạo bản ghi.</p>

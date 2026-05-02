@@ -40,6 +40,47 @@ const deviceLastStateSchema = new mongoose.Schema(
       type: Number,
       default: null
     },
+    satellites: {
+      type: Number,
+      default: null
+    },
+    gpsFix: {
+      type: Boolean,
+      default: null
+    },
+    routeNumber: {
+      type: String,
+      trim: true,
+      default: ""
+    },
+    direction: {
+      type: String,
+      enum: ["outbound", "inbound", ""],
+      default: ""
+    },
+    currentStopCode: {
+      type: String,
+      trim: true,
+      default: ""
+    },
+    nextStopCode: {
+      type: String,
+      trim: true,
+      default: ""
+    },
+    status: {
+      type: String,
+      trim: true,
+      default: ""
+    },
+    configVersion: {
+      type: Number,
+      default: null
+    },
+    rssi: {
+      type: Number,
+      default: null
+    },
     ignition: {
       type: Boolean,
       default: null

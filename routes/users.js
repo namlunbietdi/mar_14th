@@ -35,6 +35,51 @@ router.get("/", requireAuth, async (req, res) => {
   }
 });
 
+router.put("/me", requireAuth, async (req, res) => {
+  const { fullName, position, password } = req.body;
+
+  try {
+    if (!fullName || !position) {
+      return res.status(400).json({
+        success: false,
+        message: "Vui long nhap day du ho ten va chuc vu."
+      });
+    }
+
+    const updateData = {
+      fullName: String(fullName || "").trim(),
+      position: String(position || "").trim()
+    };
+
+    if (String(password || "").trim()) {
+      updateData.password = await bcrypt.hash(String(password).trim(), 10);
+    }
+
+    const user = await User.findByIdAndUpdate(req.currentUser._id, updateData, {
+      new: true,
+      runValidators: true
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Khong tim thay tai khoan dang nhap."
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Da cap nhat thong tin ca nhan.",
+      user: mapUser(user)
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Khong the cap nhat thong tin ca nhan."
+    });
+  }
+});
+
 router.post("/", requireAdmin, async (req, res) => {
   const { username, password, role, fullName, position } = req.body;
 

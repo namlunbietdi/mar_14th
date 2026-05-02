@@ -11,6 +11,7 @@ const editingDeviceId = document.getElementById("editingDeviceId");
 const deviceIdInput = document.getElementById("deviceIdInput");
 const deviceOperationStartDateInput = document.getElementById("deviceOperationStartDateInput");
 const deviceStatusSelect = document.getElementById("deviceStatusSelect");
+const deviceConfigVersionInput = document.getElementById("deviceConfigVersionInput");
 const deviceFormMessage = document.getElementById("deviceFormMessage");
 
 let devices = [];
@@ -49,8 +50,7 @@ function getDeviceStatusClass(status) {
   return "left";
 }
 
-function downloadBlob(content, filename, type) {
-  const blob = new Blob([content], { type });
+function downloadBlob(blob, filename) {
   const url = window.URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
@@ -61,17 +61,46 @@ function downloadBlob(content, filename, type) {
   window.URL.revokeObjectURL(url);
 }
 
+function getFilenameFromDisposition(contentDisposition) {
+  if (!contentDisposition) {
+    return "";
+  }
+
+  const match = contentDisposition.match(/filename="?([^"]+)"?/i);
+  return match ? match[1] : "";
+}
+
 async function exportDeviceSdPackage(device) {
   try {
     const response = await window.busApp.authFetch(`/api/devices/${device.id}/sd-package`, { headers: {} });
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.message || "Khong the xuat goi SD.");
+      let message = "Khong the xuat goi SD.";
+      const contentType = String(response.headers.get("content-type") || "");
+
+      if (contentType.includes("application/json")) {
+        const data = await response.json();
+        message = data.message || message;
+      } else {
+        const text = await response.text();
+        if (text) {
+          message = text;
+        }
+      }
+
+      throw new Error(message);
     }
 
-    const packageContent = await response.text();
-    downloadBlob(packageContent, `sd-package-${device.deviceId}.json`, "application/json;charset=utf-8;");
-    setDevicePageMessage("Da tai goi SD card.", "success");
+    const packageBlob = await response.blob();
+    const contentDisposition = response.headers.get("content-disposition");
+    const filename = getFilenameFromDisposition(contentDisposition) || `sd-package-${device.deviceId}-v${device.configVersion || 1}.zip`;
+    downloadBlob(packageBlob, filename);
+
+    const missingAudioCount = Number(response.headers.get("x-sd-missing-audio-count") || 0);
+    if (missingAudioCount > 0) {
+      setDevicePageMessage(`Da tai goi SD card. Thieu ${missingAudioCount} file audio trong zip.`, "error");
+    } else {
+      setDevicePageMessage("Da tai goi SD card.", "success");
+    }
   } catch (error) {
     setDevicePageMessage(error.message, "error");
   }
@@ -79,7 +108,7 @@ async function exportDeviceSdPackage(device) {
 
 function renderDevices() {
   if (!devices.length) {
-    deviceTableBody.innerHTML = `<tr><td colspan="7">Chưa co thiết bị nao.</td></tr>`;
+    deviceTableBody.innerHTML = `<tr><td colspan="8">Chưa co thiết bị nao.</td></tr>`;
     return;
   }
 
@@ -89,6 +118,7 @@ function renderDevices() {
       <tr>
         <td>${device.deviceId}</td>
         <td>${formatDate(device.operationStartDate)}</td>
+        <td>v${device.configVersion || 1}</td>
         <td>${device.remainingLabel}</td>
         <td>${formatDate(device.nextMaintenanceDate)}</td>
         <td><span class="status-badge ${getDeviceStatusClass(device.status)}">${getDeviceStatusLabel(device.status)}</span></td>
@@ -114,7 +144,7 @@ async function loadDevices() {
     renderDevices();
     setDevicePageMessage(`Đã tải ${devices.length} thiết bị.`, "success");
   } catch (error) {
-    deviceTableBody.innerHTML = `<tr><td colspan="7">${error.message}</td></tr>`;
+    deviceTableBody.innerHTML = `<tr><td colspan="8">${error.message}</td></tr>`;
     setDevicePageMessage(error.message, "error");
   }
 }
@@ -133,6 +163,9 @@ function openDeviceModal(mode, device = null) {
     deviceIdInput.value = device.deviceId;
     deviceOperationStartDateInput.value = String(device.operationStartDate).slice(0, 10);
     deviceStatusSelect.value = device.status;
+    deviceConfigVersionInput.value = String(device.configVersion || 1);
+  } else {
+    deviceConfigVersionInput.value = "1";
   }
 
   deviceModal.classList.remove("hidden");
@@ -154,7 +187,8 @@ deviceForm?.addEventListener("submit", async (event) => {
   const payload = {
     deviceId: deviceIdInput.value.trim(),
     operationStartDate: deviceOperationStartDateInput.value,
-    status: deviceStatusSelect.value
+    status: deviceStatusSelect.value,
+    configVersion: Number(deviceConfigVersionInput.value)
   };
 
   const isEditing = Boolean(editingDeviceId.value);

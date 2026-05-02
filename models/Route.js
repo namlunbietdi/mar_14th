@@ -23,6 +23,11 @@ const routeSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    fare: {
+      type: Number,
+      min: 0,
+      default: 0
+    },
     operatingVehicleCount: {
       type: Number,
       required: true,

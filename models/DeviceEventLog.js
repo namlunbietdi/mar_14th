@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const locationLogSchema = new mongoose.Schema(
+const deviceEventLogSchema = new mongoose.Schema(
   {
     deviceId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -23,37 +23,10 @@ const locationLogSchema = new mongoose.Schema(
       ref: "DispatchOrder",
       default: null
     },
-    latitude: {
-      type: Number,
+    eventType: {
+      type: String,
       required: true,
-      min: -90,
-      max: 90
-    },
-    longitude: {
-      type: Number,
-      required: true,
-      min: -180,
-      max: 180
-    },
-    speed: {
-      type: Number,
-      default: 0,
-      min: 0
-    },
-    heading: {
-      type: Number,
-      default: null,
-      min: 0,
-      max: 360
-    },
-    satellites: {
-      type: Number,
-      default: null,
-      min: 0
-    },
-    gpsFix: {
-      type: Boolean,
-      default: null
+      trim: true
     },
     routeNumber: {
       type: String,
@@ -65,39 +38,20 @@ const locationLogSchema = new mongoose.Schema(
       enum: ["outbound", "inbound", ""],
       default: ""
     },
-    currentStopCode: {
+    stopCode: {
       type: String,
       trim: true,
       default: ""
     },
-    nextStopCode: {
-      type: String,
-      trim: true,
-      default: ""
-    },
-    status: {
-      type: String,
-      trim: true,
-      default: ""
-    },
-    configVersion: {
-      type: Number,
-      default: null,
-      min: 1
-    },
-    rssi: {
+    latitude: {
       type: Number,
       default: null
     },
-    altitude: {
+    longitude: {
       type: Number,
       default: null
     },
-    ignition: {
-      type: Boolean,
-      default: null
-    },
-    gpsTime: {
+    eventTime: {
       type: Date,
       required: true
     },
@@ -105,6 +59,10 @@ const locationLogSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
       required: true
+    },
+    details: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null
     },
     topic: {
       type: String,
@@ -121,9 +79,8 @@ const locationLogSchema = new mongoose.Schema(
   }
 );
 
-locationLogSchema.index({ deviceCode: 1, gpsTime: -1 });
-locationLogSchema.index({ vehicleId: 1, gpsTime: -1 });
-locationLogSchema.index({ dispatchOrderId: 1, gpsTime: -1 });
-locationLogSchema.index({ receivedAt: -1 });
+deviceEventLogSchema.index({ deviceCode: 1, eventTime: -1 });
+deviceEventLogSchema.index({ eventType: 1, eventTime: -1 });
+deviceEventLogSchema.index({ dispatchOrderId: 1, eventTime: -1 });
 
-module.exports = mongoose.model("LocationLog", locationLogSchema);
+module.exports = mongoose.model("DeviceEventLog", deviceEventLogSchema);

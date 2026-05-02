@@ -1,5 +1,5 @@
 const mqtt = require("mqtt");
-const { ingestTelemetryPayload } = require("./mqtt-ingest");
+const { ingestMqttPayload } = require("./mqtt-ingest");
 
 let mqttClient = null;
 
@@ -24,12 +24,18 @@ function initMqttClient() {
   });
 
   mqttClient.on("connect", () => {
-    const topicPattern = process.env.MQTT_TOPIC_PATTERN || "devices/+/telemetry";
-    console.log(`Connected to MQTT broker. Subscribing ${topicPattern}`);
-    mqttClient.subscribe(topicPattern, (error) => {
-      if (error) {
-        console.error("MQTT subscribe failed:", error.message);
-      }
+    const topicPatterns = String(process.env.MQTT_TOPIC_PATTERNS || "bus/+/telemetry,bus/+/event")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    console.log(`Connected to MQTT broker. Subscribing ${topicPatterns.join(", ")}`);
+    topicPatterns.forEach((topicPattern) => {
+      mqttClient.subscribe(topicPattern, (error) => {
+        if (error) {
+          console.error("MQTT subscribe failed:", error.message);
+        }
+      });
     });
   });
 
@@ -44,7 +50,7 @@ function initMqttClient() {
   mqttClient.on("message", async (topic, messageBuffer) => {
     try {
       const payload = JSON.parse(messageBuffer.toString());
-      await ingestTelemetryPayload(payload, topic);
+      await ingestMqttPayload(payload, topic);
     } catch (error) {
       console.error("MQTT message processing failed:", error.message);
     }

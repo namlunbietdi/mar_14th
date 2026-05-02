@@ -1,4 +1,5 @@
 const express = require("express");
+const archiver = require("archiver");
 const Device = require("../models/Device");
 const DeviceAssignment = require("../models/DeviceAssignment");
 const { requireAdmin, requireAuth } = require("../middleware/auth");
@@ -7,6 +8,14 @@ const { buildRouteRuntimeConfig } = require("../services/runtime-config");
 const { buildDeviceSdPackage, resolveRouteIdsForDevice } = require("../services/sd-package");
 
 const router = express.Router();
+
+function parseConfigVersion(value, fallback = 1) {
+  const numericValue = Number(value);
+  if (Number.isFinite(numericValue) && numericValue > 0) {
+    return Math.trunc(numericValue);
+  }
+  return Math.trunc(Number(fallback) || 1);
+}
 
 router.get("/", requireAuth, async (req, res) => {
   try {
@@ -47,7 +56,8 @@ router.post("/", requireAdmin, async (req, res) => {
     const device = await Device.create({
       deviceId: String(deviceId || "").trim(),
       operationStartDate,
-      status
+      status,
+      configVersion: parseConfigVersion(req.body.configVersion, 1)
     });
 
     return res.status(201).json({
@@ -91,7 +101,8 @@ router.put("/:id", requireAdmin, async (req, res) => {
       {
         deviceId: String(deviceId || "").trim(),
         operationStartDate,
-        status
+        status,
+        configVersion: parseConfigVersion(req.body.configVersion, 1)
       },
       {
         new: true,
@@ -183,11 +194,14 @@ router.get("/:id/runtime-config", requireAuth, async (req, res) => {
 
     return res.json({
       success: true,
+      configVersion: parseConfigVersion(req.query.configVersion, device.configVersion || 1),
+      generatedAt: new Date().toISOString(),
       config: {
         ...config,
         device: {
           id: device._id,
           deviceId: device.deviceId,
+          configVersion: parseConfigVersion(req.query.configVersion, device.configVersion || 1),
           activeAssignmentId: activeAssignment?._id || null
         }
       }
@@ -211,7 +225,11 @@ router.get("/:id/sd-package", requireAuth, async (req, res) => {
       });
     }
 
-    const sdPackage = await buildDeviceSdPackage(device, req.query);
+    const effectiveConfigVersion = parseConfigVersion(req.query.configVersion, device.configVersion || 1);
+    const sdPackage = await buildDeviceSdPackage(device, {
+      ...req.query,
+      configVersion: effectiveConfigVersion
+    });
 
     if (!sdPackage) {
       return res.status(400).json({
@@ -220,19 +238,67 @@ router.get("/:id/sd-package", requireAuth, async (req, res) => {
       });
     }
 
-    const packagePayload = {
-      system: sdPackage.system,
-      files: {
-        "system.json": sdPackage.system,
-        "audio-map.json": sdPackage.audioMap,
-        ...Object.fromEntries(sdPackage.routeFiles.map((item) => [item.fileName, item.content]))
-      }
-    };
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="sd-package-${device.deviceId}-v${sdPackage.system.configVersion}.zip"`
+    );
+    res.setHeader("X-SD-Missing-Audio-Count", "0");
 
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.setHeader("Content-Disposition", `attachment; filename="sd-package-${device.deviceId}.json"`);
-    return res.send(JSON.stringify(packagePayload, null, 2));
+    const archive = archiver("zip", { zlib: { level: 9 } });
+    await new Promise((resolve, reject) => {
+      const onArchiveError = (error) => {
+        cleanup();
+        reject(error);
+      };
+
+      const onResponseClose = () => {
+        cleanup();
+        if (!res.writableEnded) {
+          reject(new Error("RESPONSE_CLOSED"));
+        }
+      };
+
+      const onResponseFinish = () => {
+        cleanup();
+        resolve();
+      };
+
+      function cleanup() {
+        archive.removeListener("error", onArchiveError);
+        res.removeListener("close", onResponseClose);
+        res.removeListener("finish", onResponseFinish);
+      }
+
+      archive.on("error", onArchiveError);
+      res.on("close", onResponseClose);
+      res.on("finish", onResponseFinish);
+
+      archive.pipe(res);
+
+      archive.append(JSON.stringify(sdPackage.system, null, 2), { name: "CONFIG/system.json" });
+      archive.append(JSON.stringify(sdPackage.audioMap, null, 2), { name: "CONFIG/audio-map.json" });
+
+      sdPackage.routeFiles.forEach((item) => {
+        archive.append(JSON.stringify(item.content, null, 2), { name: `ROUTES/${item.fileName}` });
+      });
+
+      archive.append("", { name: "AUDIO/STOPS/" });
+      archive.append("", { name: "AUDIO/ROUTES/" });
+      archive.append("", { name: "AUDIO/COMMON/" });
+
+      archive.finalize().catch((error) => {
+        cleanup();
+        reject(error);
+      });
+    });
+
+    return undefined;
   } catch (error) {
+    if (res.headersSent) {
+      return undefined;
+    }
+
     return res.status(500).json({
       success: false,
       message: "Khong the xuat goi SD."

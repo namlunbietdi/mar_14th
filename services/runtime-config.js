@@ -15,7 +15,7 @@ function mapDirectionStops(routeDirectionDoc) {
       lat: item.stopId?.latitude ?? null,
       lon: item.stopId?.longitude ?? null,
       terminal: Boolean(item.isTerminal),
-      audio: String(item.audioId || item.stopId?.stopCode || "").trim(),
+      audio: String(item.stopId?.stopCode || "").trim(),
       order: item.order
     }));
 }
@@ -81,7 +81,14 @@ async function buildRouteRuntimeConfig(routeId) {
       routeNumber: route.routeNumber,
       routeName: route.routeName,
       startPoint: route.startPoint,
-      endPoint: route.endPoint
+      endPoint: route.endPoint,
+      fare: Number(route.fare ?? route.ticketPrice ?? 0)
+    },
+    routeAudio: {
+      outboundStart: `${route.routeNumber}_outbound_start.mp3`,
+      inboundStart: `${route.routeNumber}_inbound_start.mp3`,
+      outboundEnd: `${route.routeNumber}_outbound_end.mp3`,
+      inboundEnd: `${route.routeNumber}_inbound_end.mp3`
     },
     outbound: mapDirectionStops(outboundDirection),
     inbound: mapDirectionStops(inboundDirection)

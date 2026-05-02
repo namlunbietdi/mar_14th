@@ -379,6 +379,20 @@ h1 {
   align-items: center;
 }
 
+.logs-toolbar {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.1fr) minmax(180px, 1fr) minmax(170px, 1fr) minmax(170px, 1fr) 130px auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.logs-details-cell {
+  display: inline-block;
+  max-width: 420px;
+  white-space: normal;
+  word-break: break-word;
+}
+
 .search-input,
 .user-form-grid select {
   width: 100%;
@@ -1038,6 +1052,10 @@ h1 {
 
   .stats-grid,
   .two-column-form {
+    grid-template-columns: 1fr;
+  }
+
+  .logs-toolbar {
     grid-template-columns: 1fr;
   }
 

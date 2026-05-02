@@ -16,6 +16,11 @@ const deviceSchema = new mongoose.Schema(
       type: String,
       enum: ["working", "issue", "removed"],
       required: true
+    },
+    configVersion: {
+      type: Number,
+      default: 1,
+      min: 1
     }
   },
   {

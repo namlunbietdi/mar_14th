@@ -8,6 +8,11 @@ function normalizeRouteIds(routeIds = []) {
   return [...new Set(routeIds.filter((id) => mongoose.Types.ObjectId.isValid(id)).map((id) => String(id)))];
 }
 
+function parseConfigVersion(query = {}) {
+  const configured = Number(query.configVersion ?? process.env.SD_CONFIG_VERSION ?? 1);
+  return Number.isFinite(configured) && configured > 0 ? Math.trunc(configured) : 1;
+}
+
 async function resolveRouteIdsForDevice(deviceId, query = {}) {
   const routeIdsFromQuery = normalizeRouteIds(
     [
@@ -79,6 +84,7 @@ async function buildDeviceSdPackage(device, query = {}) {
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
     deviceId: device.deviceId,
+    configVersion: parseConfigVersion(query),
     defaultRoute,
     routes: routeConfigs.map((config) => config.route.routeNumber)
   };
@@ -93,7 +99,12 @@ async function buildDeviceSdPackage(device, query = {}) {
   return {
     system,
     audioMap,
-    routeFiles
+    routeFiles,
+    commonAudioFiles: [
+      "gps_lost.mp3",
+      "route_changed.mp3",
+      "select_route.mp3"
+    ]
   };
 }
 

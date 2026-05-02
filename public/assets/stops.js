@@ -3,6 +3,8 @@ const stopTableBody = document.getElementById("stopTableBody");
 const stopPageMessage = document.getElementById("stopPageMessage");
 const openStopModalBtn = document.getElementById("openStopModalBtn");
 const exportStopsBtn = document.getElementById("exportStopsBtn");
+const importStopsBtn = document.getElementById("importStopsBtn");
+const importStopsFileInput = document.getElementById("importStopsFileInput");
 const stopModal = document.getElementById("stopModal");
 const closeStopModalBtn = document.getElementById("closeStopModalBtn");
 const cancelStopModalBtn = document.getElementById("cancelStopModalBtn");
@@ -26,6 +28,9 @@ let stopMarkers = [];
 
 if (currentStopUser?.role !== "admin") {
   openStopModalBtn.style.display = "none";
+  if (importStopsBtn) {
+    importStopsBtn.style.display = "none";
+  }
 }
 
 const stopMap = L.map("stopMap").setView([21.0285, 105.8542], 12);
@@ -97,6 +102,50 @@ async function exportStops() {
     downloadBlob(csvBlob, "danh-sach-diem-dung.csv", "text/csv;charset=utf-8;");
   } catch (error) {
     setStopPageMessage(error.message, "error");
+  }
+}
+
+async function importStopsFromCsv(file) {
+  if (!file) {
+    return;
+  }
+
+  try {
+    const csvContent = await file.text();
+    if (!csvContent.trim()) {
+      throw new Error("File CSV trong.");
+    }
+
+    setStopPageMessage("Dang import danh sach diem dung...");
+
+    const response = await window.busApp.authFetch("/api/stops/import-csv", {
+      method: "POST",
+      body: JSON.stringify({ csvContent })
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Khong the import CSV.");
+    }
+
+    const result = data.result || {};
+    await loadStops();
+
+    const summary = `Import xong: tao moi ${result.created || 0}, cap nhat ${result.updated || 0}, loi ${result.failed || 0}.`;
+    const firstError = Array.isArray(result.errors) && result.errors.length
+      ? ` Loi dau tien: dong ${result.errors[0].row} - ${result.errors[0].message}`
+      : "";
+    const firstWarning = Array.isArray(result.warnings) && result.warnings.length
+      ? ` Canh bao: dong ${result.warnings[0].row} - ${result.warnings[0].message}`
+      : "";
+
+    setStopPageMessage(`${summary}${firstError}${firstWarning}`, result.failed ? "error" : "success");
+  } catch (error) {
+    setStopPageMessage(error.message, "error");
+  } finally {
+    if (importStopsFileInput) {
+      importStopsFileInput.value = "";
+    }
   }
 }
 
@@ -306,6 +355,13 @@ async function openStopModal(mode, stop = null) {
 
 openStopModalBtn?.addEventListener("click", () => openStopModal("create"));
 exportStopsBtn?.addEventListener("click", exportStops);
+importStopsBtn?.addEventListener("click", () => {
+  importStopsFileInput?.click();
+});
+importStopsFileInput?.addEventListener("change", async (event) => {
+  const file = event.target.files?.[0];
+  await importStopsFromCsv(file);
+});
 closeStopModalBtn?.addEventListener("click", closeStopModal);
 cancelStopModalBtn?.addEventListener("click", closeStopModal);
 stopModal?.addEventListener("click", (event) => {

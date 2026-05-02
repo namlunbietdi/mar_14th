@@ -1,11 +1,11 @@
-﻿const express = require("express");
+﻿﻿const express = require("express");
 const Device = require("../models/Device");
 const DeviceAssignment = require("../models/DeviceAssignment");
 const DeviceLastState = require("../models/DeviceLastState");
 const LocationLog = require("../models/LocationLog");
 const { requireAdmin, requireAuth } = require("../middleware/auth");
 const { mapLocationLog, mapMonitoringSnapshot } = require("../utils/mappers");
-const { ingestTelemetryPayload } = require("../services/mqtt-ingest");
+const { ingestMqttPayload } = require("../services/mqtt-ingest");
 
 const router = express.Router();
 
@@ -107,11 +107,11 @@ router.post("/ingest", requireAdmin, async (req, res) => {
       ? req.body.payload
       : req.body;
 
-    const result = await ingestTelemetryPayload(payload, topic);
+    const result = await ingestMqttPayload(payload, topic);
 
     return res.status(201).json({
       success: true,
-      message: "Đã ghi nhận bản tin telemetry.",
+      message: "Da ghi nhan ban tin MQTT.",
       result
     });
   } catch (error) {
